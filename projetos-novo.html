@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GestãoQ — Novo Comissionamento</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#0d1117; --panel:#13191f; --border:#1e2832;
+    --accent:#f0a500; --accent2:#e07b00;
+    --text:#e8edf2; --muted:#6b7a8d;
+    --danger:#e05252; --success:#3dba7e;
+    --input-bg:#0d1117;
+  }
+  html,body { min-height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:15px; }
+  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px); background-size:48px 48px; opacity:.25; pointer-events:none; z-index:0; }
+
+  .topbar { position:sticky; top:0; z-index:100; background:rgba(13,17,23,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 32px; height:60px; gap:32px; }
+  .topbar__logo { font-family:'DM Serif Display',serif; font-size:18px; color:var(--text); text-decoration:none; margin-right:16px; }
+  .topbar__logo span { color:var(--accent); }
+  .topbar__nav { display:flex; align-items:center; gap:4px; flex:1; }
+  .nav-link { padding:6px 14px; border-radius:6px; font-size:14px; color:var(--muted); text-decoration:none; transition:color .2s,background .2s; }
+  .nav-link:hover { color:var(--text); background:var(--panel); }
+  .nav-link.active { color:var(--accent); background:rgba(240,165,0,.08); }
+  .topbar__right { display:flex; align-items:center; gap:16px; margin-left:auto; }
+  .topbar__user { display:flex; align-items:center; gap:10px; font-size:13px; }
+  .avatar { width:32px; height:32px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:500; color:#0d1117; }
+  .badge-admin { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.6px; background:rgba(240,165,0,.12); color:var(--accent); border:1px solid rgba(240,165,0,.2); border-radius:4px; padding:2px 7px; }
+
+  .page { position:relative; z-index:1; max-width:800px; margin:0 auto; padding:32px 32px 64px; }
+  .breadcrumb { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); margin-bottom:24px; }
+  .breadcrumb a { color:var(--muted); text-decoration:none; transition:color .2s; }
+  .breadcrumb a:hover { color:var(--text); }
+  .breadcrumb span { color:var(--border); }
+  .page-header { margin-bottom:32px; }
+  .page-header h2 { font-family:'DM Serif Display',serif; font-size:28px; letter-spacing:-.5px; margin-bottom:6px; }
+  .page-header p { color:var(--muted); font-size:14px; }
+
+  .form-card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:32px; animation:fadeUp .3s ease both; }
+  .form-section { margin-bottom:32px; }
+  .form-section:last-child { margin-bottom:0; }
+  .form-section__title { font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.8px; color:var(--accent); margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .form-grid--full { grid-template-columns:1fr; }
+  .field { display:flex; flex-direction:column; gap:8px; }
+  .field label { font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); }
+  .field input, .field select {
+    background:var(--input-bg); border:1px solid var(--border); border-radius:8px;
+    padding:12px 14px; color:var(--text); font-family:'DM Sans',sans-serif;
+    font-size:14px; outline:none; transition:border-color .2s; width:100%;
+  }
+  .field input:focus, .field select:focus { border-color:var(--accent); }
+  .field input::placeholder { color:var(--muted); }
+  .field select option { background:var(--panel); }
+  .field select:disabled { opacity:0.4; cursor:not-allowed; }
+  .field__hint { font-size:12px; color:var(--muted); }
+  .field input.error, .field select.error { border-color:var(--danger); }
+  .field__error { font-size:12px; color:var(--danger); display:none; }
+  .field__error.visible { display:block; }
+
+  .form-actions { display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:32px; padding-top:24px; border-top:1px solid var(--border); }
+  .btn-secondary { padding:10px 20px; background:transparent; color:var(--muted); border:1px solid var(--border); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:14px; cursor:pointer; text-decoration:none; transition:all .2s; }
+  .btn-secondary:hover { border-color:var(--muted); color:var(--text); }
+  .btn-primary { display:inline-flex; align-items:center; gap:8px; padding:10px 24px; background:var(--accent); color:#0d1117; border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:background .2s; position:relative; overflow:hidden; }
+  .btn-primary:hover { background:var(--accent2); }
+  .btn-primary.loading .btn-text { opacity:0; }
+  .btn-primary.loading .btn-spinner { opacity:1; }
+  .btn-spinner { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; }
+  .spinner { width:18px; height:18px; border:2px solid rgba(13,17,23,.3); border-top-color:#0d1117; border-radius:50%; animation:spin .7s linear infinite; }
+  .success-msg { display:none; align-items:center; gap:10px; background:rgba(61,186,126,.1); border:1px solid rgba(61,186,126,.25); border-radius:8px; padding:14px 18px; font-size:14px; color:var(--success); margin-bottom:24px; }
+  .success-msg.visible { display:flex; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  @media(max-width:600px){ .page{padding:20px 16px 48px;} .form-grid{grid-template-columns:1fr;} .topbar{padding:0 16px;gap:16px;} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="dashboard.html" class="topbar__logo">Gestão<span>Q</span></a>
+  <nav class="topbar__nav">
+    <a href="dashboard.html"   class="nav-link">Dashboard</a>
+    <a href="projetos.html"    class="nav-link active">Projetos</a>
+    <a href="projetistas.html" class="nav-link">Projetistas</a>
+    <a href="categorias.html"  class="nav-link">Classificação de erros</a>
+    <a href="usuarios.html"    class="nav-link">Usuários</a>
+  </nav>
+  <div class="topbar__right">
+    <div class="topbar__user">
+      <span class="badge-admin">Admin</span>
+      <span style="color:var(--text);font-size:13px;">kaua.soares</span>
+      <div class="avatar">KS</div>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="breadcrumb">
+    <a href="projetos.html">Projetos</a>
+    <span>/</span>
+    <span style="color:var(--text);">Novo Comissionamento</span>
+  </div>
+
+  <div class="page-header">
+    <h2>Novo Comissionamento</h2>
+    <p>Preencha os dados para cadastrar um novo comissionamento</p>
+  </div>
+
+  <div class="success-msg" id="successMsg">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Comissionamento cadastrado com sucesso! Redirecionando…
+  </div>
+
+  <div class="form-card">
+    <form id="formProjeto" novalidate>
+
+      <!-- IDENTIFICAÇÃO -->
+      <div class="form-section">
+        <div class="form-section__title">Identificação</div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="codigo">Número da NS *</label>
+            <input type="text" id="codigo" placeholder="Ex: 2000075613" maxlength="10" inputmode="numeric" pattern="[0-9]*" />
+            <span class="field__error" id="err-codigo">Informe o número da NS.</span>
+          </div>
+          <div class="field">
+            <label for="nome">Cidade *</label>
+            <input type="text" id="nome" placeholder="Ex: ALFENAS" maxlength="60" />
+            <span class="field__error" id="err-nome">Informe a cidade.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESPONSÁVEL E REDE -->
+      <div class="form-section">
+        <div class="form-section__title">Responsável e rede</div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="tipoCliente">Tipo de cliente *</label>
+            <select id="tipoCliente">
+              <option value="">Selecionar…</option>
+              <option value="externo">Cliente Externo</option>
+              <option value="interno">Cliente Interno</option>
+            </select>
+            <span class="field__error" id="err-tipoCliente">Selecione o tipo de cliente.</span>
+          </div>
+          <div class="field">
+            <label for="tipo">Tipo de atendimento *</label>
+            <select id="tipo" disabled>
+              <option value="">Selecione o tipo de cliente primeiro…</option>
+            </select>
+            <span class="field__error" id="err-tipo">Selecione o tipo de atendimento.</span>
+          </div>
+        </div>
+        <div class="form-grid form-grid--full" style="margin-top:20px;">
+          <div class="field">
+            <label for="projetista">Projetista responsável *</label>
+            <select id="projetista">
+              <option value="">Selecionar projetista…</option>
+              <option value="1">Carlos Mendes</option>
+              <option value="2">Ana Souza</option>
+              <option value="3">Roberto Lima</option>
+              <option value="4">Fernanda Costa</option>
+              <option value="5">Paulo Ferreira</option>
+              <option value="6">Juliana Ramos</option>
+              <option value="7">Marcelo Dias</option>
+            </select>
+            <div class="field__hint">Apenas projetistas ativos · Gerenciados em <a href="usuarios.html" style="color:var(--accent);text-decoration:none;">Usuários → Projetistas</a></div>
+            <span class="field__error" id="err-projetista">Selecione o projetista responsável.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRAZO -->
+      <div class="form-section">
+        <div class="form-section__title">Entrega</div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="entrega">Data do Levantamento *</label>
+            <input type="date" id="entrega" />
+            <span class="field__error" id="err-entrega">Informe a data de entrega.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="projetos.html" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary" id="btnSalvar">
+          <span class="btn-text">Cadastrar comissionamento</span>
+          <span class="btn-spinner"><div class="spinner"></div></span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</main>
+
+<script>
+  // ── CAMPO NS: apenas números, max 10 ─────────────────────
+  document.getElementById('codigo').addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '').slice(0, 10);
+  });
+
+  // ── CAMPO CIDADE: apenas letras e espaços, caixa alta ────
+  document.getElementById('nome').addEventListener('input', function() {
+    const pos = this.selectionStart;
+    this.value = this.value
+      .replace(/[^a-zA-ZÀ-ÿ\s]/g, '')
+      .toUpperCase();
+    this.setSelectionRange(pos, pos);
+  });
+
+  // ── TIPO DE ATENDIMENTO DINÂMICO ─────────────────────────
+  const selCliente = document.getElementById('tipoCliente');
+  const selTipo    = document.getElementById('tipo');
+
+  const opcoesExterno = [
+    { value: 'MT/BT-AEREO',          text: 'MT/BT — Aéreo' },
+    { value: 'RAMAL-SUB',             text: 'Ramal Sub' },
+    { value: 'RAMAL-MT',              text: 'Ramal MT' },
+  ];
+  const opcoesInterno = [
+    { value: 'MELHORIA-OPERATIVA',    text: 'Melhoria operativa' },
+    { value: 'EXPANSAO-ALIMENTADOR',  text: 'Expansão de alimentador' },
+  ];
+
+  selCliente.addEventListener('change', function() {
+    // Limpar e resetar
+    selTipo.innerHTML = '';
+    selTipo.disabled  = false;
+
+    const opcoes = this.value === 'externo' ? opcoesExterno
+                 : this.value === 'interno' ? opcoesInterno
+                 : null;
+
+    if (opcoes) {
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Selecionar tipo…';
+      selTipo.appendChild(placeholder);
+      opcoes.forEach(({ value, text }) => {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = text;
+        selTipo.appendChild(opt);
+      });
+    } else {
+      selTipo.disabled = true;
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Selecione o tipo de cliente primeiro…';
+      selTipo.appendChild(placeholder);
+    }
+
+    // Limpar erros
+    selTipo.classList.remove('error');
+    document.getElementById('err-tipo').classList.remove('visible');
+  });
+
+  // ── VALIDAÇÃO ────────────────────────────────────────────
+  const form = document.getElementById('formProjeto');
+  const btn  = document.getElementById('btnSalvar');
+
+  const campos = [
+    { id: 'codigo',      err: 'err-codigo' },
+    { id: 'nome',        err: 'err-nome' },
+    { id: 'tipoCliente', err: 'err-tipoCliente' },
+    { id: 'projetista',  err: 'err-projetista' },
+    { id: 'tipo',        err: 'err-tipo' },
+    { id: 'entrega',     err: 'err-entrega' },
+  ];
+
+  campos.forEach(({ id }) => {
+    document.getElementById(id).addEventListener('change', () => {
+      document.getElementById(id).classList.remove('error');
+      const errId = 'err-' + id;
+      if (document.getElementById(errId))
+        document.getElementById(errId).classList.remove('visible');
+    });
+  });
+
+  function validar() {
+    let ok = true;
+    campos.forEach(({ id, err }) => {
+      const el    = document.getElementById(id);
+      const errEl = document.getElementById(err);
+      if (!el.value.trim()) {
+        el.classList.add('error');
+        errEl.classList.add('visible');
+        ok = false;
+      } else {
+        el.classList.remove('error');
+        errEl.classList.remove('visible');
+      }
+    });
+    return ok;
+  }
+
+  // ── SUBMIT ───────────────────────────────────────────────
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validar()) return;
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    // Salvar dados no localStorage para uso em projeto-erros
+    const projetistaEl = document.getElementById('projetista');
+    const tipoEl       = document.getElementById('tipo');
+    const clienteEl    = document.getElementById('tipoCliente');
+
+    const dadosComissionamento = {
+      ns:          document.getElementById('codigo').value.trim(),
+      cidade:      document.getElementById('nome').value.trim(),
+      projetista:  projetistaEl.options[projetistaEl.selectedIndex].text,
+      tipoCliente: clienteEl.options[clienteEl.selectedIndex].text,
+      atendimento: tipoEl.options[tipoEl.selectedIndex].text,
+    };
+    localStorage.setItem('gestaoq_comissionamento', JSON.stringify(dadosComissionamento));
+
+    // ── CONEXÃO SUPABASE ──────────────────────────────────
+    // const { data, error } = await supabase.from('projetos').insert([{
+    //   codigo:        dadosComissionamento.ns,
+    //   nome:          dadosComissionamento.cidade,
+    //   projetista_id: document.getElementById('projetista').value,
+    //   tipo_rede:     dadosComissionamento.atendimento,
+    //   data_entrega:  document.getElementById('entrega').value,
+    //   criado_por:    (await supabase.auth.getUser()).data.user.id,
+    // }])
+    // ─────────────────────────────────────────────────────
+
+    await new Promise(r => setTimeout(r, 1200));
+
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    document.getElementById('successMsg').classList.add('visible');
+    form.reset();
+    selTipo.disabled = true;
+    selTipo.innerHTML = '<option value="">Selecione o tipo de cliente primeiro…</option>';
+
+    setTimeout(() => { window.location.href = 'projeto-erros.html'; }, 1800);
+  });
+</script>
+
+</body>
+</html>

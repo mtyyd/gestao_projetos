@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GestãoQ — Classificação de Erros</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  :root {
+    --bg:#0d1117; --panel:#13191f; --panel2:#0f151a; --border:#1e2832;
+    --accent:#f0a500; --accent2:#e07b00;
+    --text:#e8edf2; --muted:#6b7a8d;
+    --danger:#e05252; --success:#3dba7e; --info:#4a9edd;
+    --input-bg:#0d1117;
+  }
+  html,body { min-height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:15px; }
+  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px); background-size:48px 48px; opacity:.25; pointer-events:none; z-index:0; }
+
+  .topbar { position:sticky; top:0; z-index:100; background:rgba(13,17,23,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 32px; height:60px; gap:32px; }
+  .topbar__logo { font-family:'DM Serif Display',serif; font-size:18px; color:var(--text); text-decoration:none; margin-right:16px; }
+  .topbar__logo span { color:var(--accent); }
+  .topbar__nav { display:flex; align-items:center; gap:4px; flex:1; }
+  .nav-link { padding:6px 14px; border-radius:6px; font-size:14px; color:var(--muted); text-decoration:none; transition:color .2s,background .2s; }
+  .nav-link:hover { color:var(--text); background:var(--panel); }
+  .nav-link.active { color:var(--accent); background:rgba(240,165,0,.08); }
+  .topbar__right { display:flex; align-items:center; gap:16px; margin-left:auto; }
+  .topbar__user { display:flex; align-items:center; gap:10px; font-size:13px; }
+  .avatar { width:32px; height:32px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:500; color:#0d1117; }
+  .badge-admin { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.6px; background:rgba(240,165,0,.12); color:var(--accent); border:1px solid rgba(240,165,0,.2); border-radius:4px; padding:2px 7px; }
+
+  /* ACESSO NEGADO */
+  .acesso-negado { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 60px); gap:16px; text-align:center; padding:32px; }
+  .acesso-negado svg { color:var(--border); opacity:.6; }
+  .acesso-negado h2 { font-family:'DM Serif Display',serif; font-size:24px; color:var(--muted); }
+  .acesso-negado p { font-size:14px; color:var(--muted); max-width:320px; }
+
+  .page { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:32px 32px 64px; }
+  .page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:8px; gap:16px; }
+  .page-header h1 { font-family:'DM Serif Display',serif; font-size:28px; letter-spacing:-.5px; margin-bottom:4px; }
+  .page-header p { color:var(--muted); font-size:14px; }
+  .admin-notice { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:var(--accent); background:rgba(240,165,0,.08); border:1px solid rgba(240,165,0,.15); border-radius:6px; padding:4px 10px; margin-bottom:24px; }
+
+  /* LAYOUT DOIS PAINEIS */
+  .layout { display:grid; grid-template-columns:280px 1fr; gap:20px; align-items:start; }
+
+  /* PAINEL ESQUERDO — GRUPOS */
+  .grupos-panel { background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow:hidden; position:sticky; top:80px; }
+  .grupos-panel__header { padding:16px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .grupos-panel__title { font-size:13px; font-weight:500; }
+  .btn-icon { width:28px; height:28px; display:flex; align-items:center; justify-content:center; background:rgba(240,165,0,.1); color:var(--accent); border:1px solid rgba(240,165,0,.2); border-radius:6px; cursor:pointer; transition:background .2s; flex-shrink:0; border:none; }
+  .btn-icon:hover { background:rgba(240,165,0,.2); }
+  .grupo-list { padding:8px; }
+  .grupo-item { display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:7px; cursor:pointer; transition:background .15s; }
+  .grupo-item:hover { background:rgba(255,255,255,.03); }
+  .grupo-item.active { background:rgba(240,165,0,.08); }
+  .grupo-item__dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .grupo-item__name { font-size:13px; flex:1; }
+  .grupo-item.active .grupo-item__name { color:var(--accent); font-weight:500; }
+  .grupo-item__count { font-size:11px; color:var(--muted); background:rgba(255,255,255,.04); border-radius:4px; padding:1px 6px; }
+  .grupo-item__actions { display:flex; gap:2px; opacity:0; transition:opacity .15s; }
+  .grupo-item:hover .grupo-item__actions { opacity:1; }
+  .ga-btn { width:20px; height:20px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; border-radius:4px; cursor:pointer; color:var(--muted); transition:all .15s; }
+  .ga-btn:hover { background:rgba(255,255,255,.08); color:var(--text); }
+  .ga-btn.del:hover { background:rgba(224,82,82,.12); color:var(--danger); }
+
+  /* PAINEL DIREITO — ERROS DA CATEGORIA */
+  .erros-panel { display:flex; flex-direction:column; gap:16px; }
+
+  .erros-header { display:flex; align-items:center; justify-content:space-between; }
+  .erros-header__left h2 { font-size:18px; font-family:'DM Serif Display',serif; letter-spacing:-.3px; }
+  .erros-header__left p { font-size:13px; color:var(--muted); margin-top:2px; }
+
+  .btn-primary { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--accent); color:#0d1117; border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:background .2s; }
+  .btn-primary:hover { background:var(--accent2); }
+
+  /* CARDS DE ERRO */
+  .erros-lista { display:flex; flex-direction:column; gap:10px; }
+
+  .erro-item { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px 18px; display:flex; align-items:flex-start; gap:14px; transition:border-color .2s; animation:fadeUp .2s ease both; }
+  .erro-item:hover { border-color:rgba(240,165,0,.2); }
+  .erro-item:hover .erro-item__actions { opacity:1; }
+
+  .erro-item__idx { width:22px; height:22px; background:rgba(240,165,0,.1); color:var(--accent); border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; flex-shrink:0; margin-top:1px; }
+  .erro-item__body { flex:1; min-width:0; }
+  .erro-item__nome { font-size:14px; font-weight:500; margin-bottom:3px; }
+  .erro-item__desc { font-size:12px; color:var(--muted); line-height:1.5; }
+
+  .grav-pill { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.4px; padding:2px 8px; border-radius:20px; flex-shrink:0; }
+  .grav--grave { color:var(--danger);  background:rgba(224,82,82,.12); }
+  .grav--medio { color:var(--accent);  background:rgba(240,165,0,.12); }
+  .grav--leve  { color:var(--success); background:rgba(61,186,126,.12); }
+
+  .erro-item__actions { display:flex; gap:4px; opacity:0; transition:opacity .15s; flex-shrink:0; }
+  .ea-btn { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; border-radius:5px; cursor:pointer; color:var(--muted); transition:all .15s; }
+  .ea-btn:hover { background:rgba(255,255,255,.06); color:var(--text); }
+  .ea-btn.del:hover { background:rgba(224,82,82,.1); color:var(--danger); }
+
+  .empty-state { background:var(--panel); border:1px dashed var(--border); border-radius:10px; padding:40px 24px; text-align:center; color:var(--muted); }
+  .empty-state p { font-size:14px; color:var(--text); margin-bottom:4px; }
+  .empty-state span { font-size:13px; }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,.65); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+  .modal-overlay.visible { opacity:1; pointer-events:all; }
+  .modal { background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:28px; width:100%; max-width:440px; transform:translateY(14px); transition:transform .2s; }
+  .modal-overlay.visible .modal { transform:translateY(0); }
+  .modal__title { font-family:'DM Serif Display',serif; font-size:20px; margin-bottom:4px; }
+  .modal__sub { font-size:13px; color:var(--muted); margin-bottom:20px; }
+  .mfield { margin-bottom:14px; }
+  .mfield label { display:block; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:7px; }
+  .mfield input, .mfield select, .mfield textarea { width:100%; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; transition:border-color .2s; }
+  .mfield input:focus, .mfield select:focus, .mfield textarea:focus { border-color:var(--accent); }
+  .mfield input::placeholder, .mfield textarea::placeholder { color:var(--muted); }
+  .mfield select option { background:var(--panel); }
+  .mfield textarea { resize:vertical; min-height:72px; line-height:1.5; }
+  .mfield input.err { border-color:var(--danger); }
+  .modal__actions { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; padding-top:18px; border-top:1px solid var(--border); }
+  .btn-cancel { padding:8px 16px; background:transparent; color:var(--muted); border:1px solid var(--border); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:all .2s; }
+  .btn-cancel:hover { color:var(--text); border-color:var(--muted); }
+  .btn-confirm { padding:8px 20px; background:var(--accent); color:#0d1117; border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:background .2s; }
+  .btn-confirm:hover { background:var(--accent2); }
+
+  .toast { position:fixed; bottom:24px; right:24px; z-index:400; background:var(--success); color:#0d1117; padding:11px 18px; border-radius:8px; font-size:13px; font-weight:500; display:flex; align-items:center; gap:8px; transform:translateY(60px); opacity:0; transition:all .25s; pointer-events:none; }
+  .toast.visible { transform:translateY(0); opacity:1; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  @media(max-width:900px){ .layout{grid-template-columns:1fr;} .grupos-panel{position:static;} }
+  @media(max-width:600px){ .page{padding:20px 16px 48px;} .topbar{padding:0 16px;gap:12px;} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="dashboard.html" class="topbar__logo">Gestão<span>Q</span></a>
+    <nav class="topbar__nav">
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="projetos.html" class="nav-link">Projetos</a>
+    <a href="projetistas.html" class="nav-link">Projetistas</a>
+    <a href="categorias.html" class="nav-link active">Classificação de erros</a>
+    <a href="usuarios.html" class="nav-link">Usuários</a>
+  </nav>
+    <div class="topbar__right">
+    <div class="topbar__user">
+      <span class="badge-admin">Admin</span>
+      <span style="color:var(--text);font-size:13px;">kaua.soares</span>
+      <div class="avatar">KS</div>
+    </div>
+  </div>
+</header>
+  </div>
+</header>
+
+<!-- ACESSO NEGADO (visível para não-admin) -->
+<div class="acesso-negado" id="acessoNegado" style="display:none;">
+  <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+  <h2>Acesso restrito</h2>
+  <p>Esta página é exclusiva para administradores do sistema.</p>
+</div>
+
+<main class="page" id="pageContent">
+
+  <div class="page-header">
+    <div>
+      <h1>Classificação de erros</h1>
+      <p>Gerencie grupos e classificações utilizados no registro de erros</p>
+    </div>
+  </div>
+
+  <div class="admin-notice">
+    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+    Visível apenas para administradores
+  </div>
+
+  <div class="layout">
+
+    <!-- PAINEL ESQUERDO — GRUPOS -->
+    <div class="grupos-panel">
+      <div class="grupos-panel__header">
+        <span class="grupos-panel__title">Grupos</span>
+        <button class="btn-icon" onclick="abrirModalGrupo()" title="Novo grupo">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <div class="grupo-list" id="grupoList"></div>
+    </div>
+
+    <!-- PAINEL DIREITO — ERROS DO GRUPO -->
+    <div class="erros-panel">
+      <div class="erros-header">
+        <div class="erros-header__left">
+          <h2 id="grupoTitulo">Selecione um grupo</h2>
+          <p id="grupoSub">Clique em um grupo à esquerda para ver e editar suas categorias</p>
+        </div>
+        <button class="btn-primary" id="btnNovaCategoria" onclick="abrirModalCategoria()" style="display:none;">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Nova categoria
+        </button>
+      </div>
+
+      <div class="erros-lista" id="errosLista"></div>
+
+      <div class="empty-state" id="emptyState">
+        <svg width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 12px;display:block;opacity:.25;"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        <p>Selecione um grupo</p>
+        <span>As categorias desse grupo aparecerão aqui</span>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL: GRUPO -->
+<div class="modal-overlay" id="modalGrupo" onclick="fecharModal('modalGrupo',event)">
+  <div class="modal">
+    <div class="modal__title" id="tituloModalGrupo">Novo grupo</div>
+    <div class="modal__sub">Grupos organizam as categorias de erro por área</div>
+    <div class="mfield">
+      <label>Nome do grupo *</label>
+      <input type="text" id="gNome" placeholder="Ex: Elétrico" />
+    </div>
+    <div class="mfield">
+      <label>Cor de identificação</label>
+      <select id="gCor">
+        <option value="#e05252">Vermelho</option>
+        <option value="#f0a500">Âmbar</option>
+        <option value="#4a9edd">Azul</option>
+        <option value="#3dba7e">Verde</option>
+        <option value="#b07ddd">Roxo</option>
+        <option value="#f07830">Laranja</option>
+      </select>
+    </div>
+    <div class="modal__actions">
+      <button class="btn-cancel" onclick="fecharModal('modalGrupo')">Cancelar</button>
+      <button class="btn-confirm" onclick="salvarGrupo()">Salvar grupo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CATEGORIA -->
+<div class="modal-overlay" id="modalCategoria" onclick="fecharModal('modalCategoria',event)">
+  <div class="modal">
+    <div class="modal__title" id="tituloModalCategoria">Nova categoria</div>
+    <div class="modal__sub" id="subModalCategoria">—</div>
+    <div class="mfield">
+      <label>Nome da categoria *</label>
+      <input type="text" id="cNome" placeholder="Ex: Dimensionamento de condutores" />
+    </div>
+    <div class="mfield">
+      <label>Descrição</label>
+      <textarea id="cDesc" placeholder="Descreva quando este erro ocorre…"></textarea>
+    </div>
+    <div class="mfield">
+      <label>Gravidade padrão</label>
+      <select id="cGrav">
+        <option value="grave">Grave</option>
+        <option value="medio">Médio</option>
+        <option value="leve">Leve</option>
+      </select>
+    </div>
+    <div class="modal__actions">
+      <button class="btn-cancel" onclick="fecharModal('modalCategoria')">Cancelar</button>
+      <button class="btn-confirm" onclick="salvarCategoria()">Salvar categoria</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+  <span id="toastMsg">Salvo!</span>
+</div>
+
+<script>
+// ── PERFIL SIMULADO ──────────────────────────────────────────
+// Na integração com Supabase, virá da sessão: supabase.auth.getUser()
+const PERFIL_ATUAL = 'admin'; // trocar para 'editor' ou 'leitor' para testar bloqueio
+
+if (PERFIL_ATUAL !== 'admin') {
+  document.getElementById('pageContent').style.display = 'none';
+  document.getElementById('acessoNegado').style.display = 'flex';
+}
+
+// ── DADOS ────────────────────────────────────────────────────
+let grupos = [
+  { id:1, nome:'Elétrico',        cor:'#e05252' },
+  { id:2, nome:'Documentação',    cor:'#f0a500' },
+  { id:3, nome:'Dimensionamento', cor:'#4a9edd' },
+  { id:4, nome:'Proteção',        cor:'#3dba7e' },
+  { id:5, nome:'Outros',          cor:'#b07ddd' },
+];
+
+let categorias = [
+  { id:1, grupoId:1, nome:'Dimensionamento de condutores',  desc:'Condutor subdimensionado para a carga prevista.',      grav:'grave' },
+  { id:2, grupoId:1, nome:'Proteção e seccionamento',       desc:'Dispositivos de proteção incorretos ou ausentes.',     grav:'grave' },
+  { id:3, grupoId:1, nome:'Aterramento',                    desc:'Sistema de aterramento inadequado ou ausente.',        grav:'medio' },
+  { id:4, grupoId:1, nome:'Queda de tensão',                desc:'Queda de tensão acima do limite normativo.',           grav:'medio' },
+  { id:5, grupoId:2, nome:'Memorial descritivo incompleto', desc:'Memorial sem informações técnicas obrigatórias.',      grav:'medio' },
+  { id:6, grupoId:2, nome:'Plantas e diagramas',            desc:'Plantas desatualizadas ou sem cotagem correta.',       grav:'medio' },
+  { id:7, grupoId:2, nome:'ART não anexada',                desc:'Anotação de Responsabilidade Técnica ausente.',        grav:'leve'  },
+  { id:8, grupoId:3, nome:'Transformadores',                desc:'Transformador subdimensionado ou mal especificado.',   grav:'grave' },
+  { id:9, grupoId:3, nome:'Postes e estruturas',            desc:'Estrutura inadequada para o tipo de rede.',            grav:'medio' },
+  { id:10,grupoId:4, nome:'Coordenação de proteção',        desc:'Seletividade entre os dispositivos não atendida.',     grav:'grave' },
+  { id:11,grupoId:4, nome:'Seletividade',                   desc:'Proteções não seletivas entre si.',                    grav:'grave' },
+  { id:12,grupoId:5, nome:'Não conformidade geral',         desc:'Inconformidade não enquadrada nas demais categorias.', grav:'leve'  },
+];
+
+let proximoGrupoId = 10, proximoCatId = 20;
+let grupoAtivo = null, editandoGrupo = null, editandoCat = null;
+
+// ── RENDER GRUPOS ─────────────────────────────────────────────
+function renderGrupos() {
+  const lista = document.getElementById('grupoList');
+  lista.innerHTML = grupos.map(g => {
+    const qtd = categorias.filter(c => c.grupoId === g.id).length;
+    return `
+      <div class="grupo-item${grupoAtivo===g.id?' active':''}" onclick="selecionarGrupo(${g.id})">
+        <div class="grupo-item__dot" style="background:${g.cor};"></div>
+        <span class="grupo-item__name">${g.nome}</span>
+        <span class="grupo-item__count">${qtd}</span>
+        <div class="grupo-item__actions">
+          <button class="ga-btn" onclick="event.stopPropagation();editarGrupo(${g.id})" title="Editar">
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          </button>
+          <button class="ga-btn del" onclick="event.stopPropagation();removerGrupo(${g.id})" title="Remover">
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── SELECIONAR GRUPO ─────────────────────────────────────────
+function selecionarGrupo(id) {
+  grupoAtivo = id;
+  const g = grupos.find(g => g.id === id);
+  document.getElementById('grupoTitulo').textContent = g.nome;
+  document.getElementById('grupoSub').textContent = 'Categorias de erro do grupo ' + g.nome;
+  document.getElementById('btnNovaCategoria').style.display = '';
+  document.getElementById('emptyState').style.display = 'none';
+  renderGrupos();
+  renderCategorias();
+}
+
+// ── RENDER CATEGORIAS ─────────────────────────────────────────
+function renderCategorias() {
+  const lista = document.getElementById('errosLista');
+  const cats = categorias.filter(c => c.grupoId === grupoAtivo);
+
+  if (!cats.length) {
+    lista.innerHTML = '';
+    document.getElementById('emptyState').style.display = '';
+    document.getElementById('emptyState').querySelector('p').textContent = 'Nenhuma categoria neste grupo';
+    document.getElementById('emptyState').querySelector('span').textContent = 'Clique em "Nova categoria" para adicionar';
+    return;
+  }
+
+  document.getElementById('emptyState').style.display = 'none';
+  const gravCls = { grave:'grav--grave', medio:'grav--medio', leve:'grav--leve' };
+  const gravLabel = { grave:'Grave', medio:'Médio', leve:'Leve' };
+
+  lista.innerHTML = cats.map((cat, i) => `
+    <div class="erro-item" id="cat-${cat.id}">
+      <div class="erro-item__idx">${i+1}</div>
+      <div class="erro-item__body">
+        <div class="erro-item__nome">${cat.nome}</div>
+        ${cat.desc ? `<div class="erro-item__desc">${cat.desc}</div>` : ''}
+      </div>
+      <span class="grav-pill ${gravCls[cat.grav]}">${gravLabel[cat.grav]}</span>
+      <div class="erro-item__actions">
+        <button class="ea-btn" onclick="editarCategoria(${cat.id})" title="Editar">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        </button>
+        <button class="ea-btn del" onclick="removerCategoria(${cat.id})" title="Remover">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+// ── MODAIS: GRUPO ─────────────────────────────────────────────
+function abrirModalGrupo(id = null) {
+  editandoGrupo = id;
+  document.getElementById('tituloModalGrupo').textContent = id ? 'Editar grupo' : 'Novo grupo';
+  if (id) {
+    const g = grupos.find(g => g.id === id);
+    document.getElementById('gNome').value = g.nome;
+    document.getElementById('gCor').value  = g.cor;
+  } else {
+    document.getElementById('gNome').value = '';
+    document.getElementById('gCor').value  = '#e05252';
+  }
+  document.getElementById('modalGrupo').classList.add('visible');
+  setTimeout(() => document.getElementById('gNome').focus(), 180);
+}
+
+function editarGrupo(id) { abrirModalGrupo(id); }
+
+function removerGrupo(id) {
+  grupos = grupos.filter(g => g.id !== id);
+  categorias = categorias.filter(c => c.grupoId !== id);
+  if (grupoAtivo === id) {
+    grupoAtivo = null;
+    document.getElementById('grupoTitulo').textContent = 'Selecione um grupo';
+    document.getElementById('grupoSub').textContent = 'Clique em um grupo à esquerda para ver e editar suas categorias';
+    document.getElementById('btnNovaCategoria').style.display = 'none';
+    document.getElementById('errosLista').innerHTML = '';
+    document.getElementById('emptyState').style.display = '';
+  }
+  renderGrupos();
+  toast('Grupo removido.');
+}
+
+function salvarGrupo() {
+  const nome = document.getElementById('gNome').value.trim();
+  const cor  = document.getElementById('gCor').value;
+  if (!nome) { document.getElementById('gNome').classList.add('err'); return; }
+  document.getElementById('gNome').classList.remove('err');
+
+  if (editandoGrupo) {
+    const g = grupos.find(g => g.id === editandoGrupo);
+    g.nome = nome; g.cor = cor;
+    toast('Grupo atualizado!');
+  } else {
+    grupos.push({ id: proximoGrupoId++, nome, cor });
+    toast('Grupo criado!');
+  }
+  fecharModal('modalGrupo');
+  renderGrupos();
+  editandoGrupo = null;
+}
+
+// ── MODAIS: CATEGORIA ─────────────────────────────────────────
+function abrirModalCategoria(id = null) {
+  editandoCat = id;
+  const g = grupos.find(g => g.id === grupoAtivo);
+  document.getElementById('tituloModalCategoria').textContent = id ? 'Editar categoria' : 'Nova categoria';
+  document.getElementById('subModalCategoria').textContent = 'Grupo: ' + (g?.nome || '—');
+  if (id) {
+    const cat = categorias.find(c => c.id === id);
+    document.getElementById('cNome').value = cat.nome;
+    document.getElementById('cDesc').value = cat.desc;
+    document.getElementById('cGrav').value = cat.grav;
+  } else {
+    document.getElementById('cNome').value = '';
+    document.getElementById('cDesc').value = '';
+    document.getElementById('cGrav').value = 'medio';
+  }
+  document.getElementById('modalCategoria').classList.add('visible');
+  setTimeout(() => document.getElementById('cNome').focus(), 180);
+}
+
+function editarCategoria(id) { abrirModalCategoria(id); }
+
+function removerCategoria(id) {
+  const el = document.getElementById('cat-' + id);
+  if (el) { el.style.opacity='0'; el.style.transition='opacity .15s'; }
+  setTimeout(() => {
+    categorias = categorias.filter(c => c.id !== id);
+    renderGrupos();
+    renderCategorias();
+    toast('Categoria removida.');
+  }, 150);
+}
+
+function salvarCategoria() {
+  const nome = document.getElementById('cNome').value.trim();
+  const desc = document.getElementById('cDesc').value.trim();
+  const grav = document.getElementById('cGrav').value;
+  if (!nome) { document.getElementById('cNome').classList.add('err'); return; }
+  document.getElementById('cNome').classList.remove('err');
+
+  if (editandoCat) {
+    const cat = categorias.find(c => c.id === editandoCat);
+    cat.nome = nome; cat.desc = desc; cat.grav = grav;
+    toast('Categoria atualizada!');
+  } else {
+    categorias.push({ id: proximoCatId++, grupoId: grupoAtivo, nome, desc, grav });
+    toast('Categoria adicionada!');
+  }
+  fecharModal('modalCategoria');
+  renderGrupos();
+  renderCategorias();
+  editandoCat = null;
+}
+
+// ── UTILITÁRIOS ──────────────────────────────────────────────
+function fecharModal(id, e) {
+  if (e && e.target !== document.getElementById(id)) return;
+  document.getElementById(id).classList.remove('visible');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), 2500);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('visible'));
+  }
+});
+
+renderGrupos();
+</script>
+
+</body>
+</html>

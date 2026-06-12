@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GestãoQ — Projetos</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #0d1117;
+    --panel:   #13191f;
+    --border:  #1e2832;
+    --accent:  #f0a500;
+    --accent2: #e07b00;
+    --text:    #e8edf2;
+    --muted:   #6b7a8d;
+    --danger:  #e05252;
+    --success: #3dba7e;
+    --info:    #4a9edd;
+  }
+
+  html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 32px; height: 60px; gap: 32px;
+  }
+
+  .topbar__logo { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); text-decoration: none; margin-right: 16px; }
+  .topbar__logo span { color: var(--accent); }
+
+  .topbar__nav { display: flex; align-items: center; gap: 4px; flex: 1; }
+
+  .nav-link { padding: 6px 14px; border-radius: 6px; font-size: 14px; color: var(--muted); text-decoration: none; transition: color 0.2s, background 0.2s; }
+  .nav-link:hover { color: var(--text); background: var(--panel); }
+  .nav-link.active { color: var(--accent); background: rgba(240,165,0,0.08); }
+
+  .topbar__right { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+  .topbar__user { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+  .avatar { width: 32px; height: 32px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: #0d1117; }
+  .badge-admin { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; background: rgba(240,165,0,0.12); color: var(--accent); border: 1px solid rgba(240,165,0,0.2); border-radius: 4px; padding: 2px 7px; }
+
+  .page { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 32px 32px 64px; }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; gap: 16px; }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: 28px; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .page-header p { color: var(--muted); font-size: 14px; }
+
+  .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--accent); color: #0d1117; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.2s; white-space: nowrap; }
+  .btn-primary:hover { background: var(--accent2); }
+
+  .filters {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  .search-wrap input { width: 100%; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px 9px 36px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input::placeholder { color: var(--muted); }
+
+  .filter-select { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; cursor: pointer; }
+  .filter-select:focus { border-color: var(--accent); }
+
+  .table-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; animation: fadeUp 0.3s ease both; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 11px 20px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); text-align: left; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border); }
+  tbody td { padding: 15px 20px; font-size: 14px; border-bottom: 1px solid rgba(30,40,50,0.6); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background 0.15s; cursor: pointer; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+  .status-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+  .status-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .status--andamento { color: var(--info);    background: rgba(74,158,221,0.1); }
+  .status--revisao   { color: var(--accent);  background: rgba(240,165,0,0.1); }
+  .status--aprovado  { color: var(--success); background: rgba(61,186,126,0.1); }
+  .status--reprovado  { color: var(--danger);  background: rgba(224,82,82,0.1); }
+  .status--ressalvas  { color: var(--accent);  background: rgba(240,165,0,0.1); }
+  .status--aprovado   { color: var(--success); background: rgba(61,186,126,0.1); }
+
+  .tipo-badge { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+  .table-footer { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 768px) { .page { padding: 20px 16px 48px; } .topbar { padding: 0 16px; gap: 16px; } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="dashboard.html" class="topbar__logo">Gestão<span>Q</span></a>
+    <nav class="topbar__nav">
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="projetos.html" class="nav-link active">Projetos</a>
+    <a href="projetistas.html" class="nav-link">Projetistas</a>
+    <a href="categorias.html" class="nav-link">Classificação de erros</a>
+    <a href="usuarios.html" class="nav-link">Usuários</a>
+  </nav>
+    <div class="topbar__right">
+    <div class="topbar__user">
+      <span class="badge-admin">Admin</span>
+      <span style="color:var(--text);font-size:13px;">kaua.soares</span>
+      <div class="avatar">KS</div>
+    </div>
+  </div>
+</header>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="page-header">
+    <div>
+      <h1>Projetos</h1>
+      <p>Gerencie e acompanhe todos os projetos cadastrados</p>
+    </div>
+    <a href="projetos-novo.html" class="btn-primary">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Novo Comissionamento
+    </a>
+  </div>
+
+  <div class="filters">
+    <div class="search-wrap">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Buscar por NS ou cidade…" id="searchInput" oninput="filtrar()">
+    </div>
+    <select class="filter-select" id="filterStatus" onchange="filtrar()">
+      <option value="">Todos os resultados</option>
+      <option value="aprovado">Aprovado</option>
+      <option value="ressalvas">Aprovado com ressalvas</option>
+      <option value="reprovado">Reprovado</option>
+    </select>
+    <select class="filter-select" id="filterTipo" onchange="filtrar()">
+      <option value="">Todos os clientes</option>
+      <option value="externo">Cliente Externo</option>
+      <option value="interno">Cliente Interno</option>
+    </select>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Nota de Serviço</th>
+          <th>Cidade</th>
+          <th>Projetista</th>
+          <th>Cliente</th>
+          <th>Entrega</th>
+          <th>Status</th>
+          <th>Erros</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaProjetos">
+        <tr data-status="aprovado" data-tipo="externo">
+          <td style="color:var(--muted);font-weight:500;">2000075613</td>
+          <td>Alfenas</td>
+          <td>Carlos Mendes</td>
+          <td><span class="tipo-badge">Externo</span></td>
+          <td style="color:var(--muted);">15/06/2026</td>
+          <td><span class="status-badge status--aprovado">Aprovado</span></td>
+          <td style="color:var(--success);">3</td>
+        </tr>
+        <tr data-status="ressalvas" data-tipo="externo">
+          <td style="color:var(--muted);font-weight:500;">2000071209</td>
+          <td>Machado</td>
+          <td>Ana Souza</td>
+          <td><span class="tipo-badge">Externo</span></td>
+          <td style="color:var(--muted);">22/06/2026</td>
+          <td><span class="status-badge status--ressalvas">Aprovado com ressalvas</span></td>
+          <td style="color:var(--accent);">7</td>
+        </tr>
+        <tr data-status="reprovado" data-tipo="interno">
+          <td style="color:var(--muted);font-weight:500;">2000068441</td>
+          <td>Três Corações</td>
+          <td>Roberto Lima</td>
+          <td><span class="tipo-badge">Interno</span></td>
+          <td style="color:var(--muted);">01/05/2026</td>
+          <td><span class="status-badge status--reprovado">Reprovado</span></td>
+          <td style="color:var(--danger);">28</td>
+        </tr>
+        <tr data-status="aprovado" data-tipo="externo">
+          <td style="color:var(--muted);font-weight:500;">2000065302</td>
+          <td>Varginha</td>
+          <td>Fernanda Costa</td>
+          <td><span class="tipo-badge">Externo</span></td>
+          <td style="color:var(--muted);">10/04/2026</td>
+          <td><span class="status-badge status--aprovado">Aprovado</span></td>
+          <td style="color:var(--success);">2</td>
+        </tr>
+        <tr data-status="ressalvas" data-tipo="externo">
+          <td style="color:var(--muted);font-weight:500;">2000062198</td>
+          <td>Pouso Alegre</td>
+          <td>Paulo Ferreira</td>
+          <td><span class="tipo-badge">Externo</span></td>
+          <td style="color:var(--muted);">28/03/2026</td>
+          <td><span class="status-badge status--ressalvas">Aprovado com ressalvas</span></td>
+          <td style="color:var(--accent);">5</td>
+        </tr>
+        <tr data-status="reprovado" data-tipo="externo">
+          <td style="color:var(--muted);font-weight:500;">2000059874</td>
+          <td>Lavras</td>
+          <td>Marcelo Dias</td>
+          <td><span class="tipo-badge">Externo</span></td>
+          <td style="color:var(--muted);">30/07/2026</td>
+          <td><span class="status-badge status--reprovado">Reprovado</span></td>
+          <td style="color:var(--danger);">14</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="table-footer">
+      <span id="countLabel">6 projetos encontrados</span>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function filtrar() {
+    const busca  = document.getElementById('searchInput').value.toLowerCase();
+    const status = document.getElementById('filterStatus').value;
+    const tipo   = document.getElementById('filterTipo').value;
+    const linhas = document.querySelectorAll('#tabelaProjetos tr');
+    let visiveis = 0;
+
+    linhas.forEach(tr => {
+      const texto    = tr.innerText.toLowerCase();
+      const trStatus = tr.dataset.status;
+      const trTipo   = tr.dataset.tipo;
+
+      const okBusca  = !busca  || texto.includes(busca);
+      const okStatus = !status || trStatus === status;
+      const okTipo   = !tipo   || trTipo === tipo;
+
+      const visivel = okBusca && okStatus && okTipo;
+      tr.style.display = visivel ? '' : 'none';
+      if (visivel) visiveis++;
+    });
+
+    document.getElementById('countLabel').textContent =
+      visiveis + (visiveis === 1 ? ' projeto encontrado' : ' projetos encontrados');
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GestãoQ — Projetistas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#0d1117; --panel:#13191f; --border:#1e2832;
+    --accent:#f0a500; --accent2:#e07b00;
+    --text:#e8edf2; --muted:#6b7a8d;
+    --danger:#e05252; --success:#3dba7e; --info:#4a9edd;
+  }
+  html,body { min-height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:15px; }
+  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px); background-size:48px 48px; opacity:.25; pointer-events:none; z-index:0; }
+
+  .topbar { position:sticky; top:0; z-index:100; background:rgba(13,17,23,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 32px; height:60px; gap:32px; }
+  .topbar__logo { font-family:'DM Serif Display',serif; font-size:18px; color:var(--text); text-decoration:none; margin-right:16px; }
+  .topbar__logo span { color:var(--accent); }
+  .topbar__nav { display:flex; align-items:center; gap:4px; flex:1; }
+  .nav-link { padding:6px 14px; border-radius:6px; font-size:14px; color:var(--muted); text-decoration:none; transition:color .2s,background .2s; }
+  .nav-link:hover { color:var(--text); background:var(--panel); }
+  .nav-link.active { color:var(--accent); background:rgba(240,165,0,.08); }
+  .topbar__right { display:flex; align-items:center; gap:16px; margin-left:auto; }
+  .topbar__user { display:flex; align-items:center; gap:10px; font-size:13px; }
+  .avatar { width:32px; height:32px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:500; color:#0d1117; }
+  .badge-admin { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.6px; background:rgba(240,165,0,.12); color:var(--accent); border:1px solid rgba(240,165,0,.2); border-radius:4px; padding:2px 7px; }
+
+  .page { position:relative; z-index:1; max-width:1400px; margin:0 auto; padding:28px 32px 64px; }
+  .page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; gap:16px; }
+  .page-header h1 { font-family:'DM Serif Display',serif; font-size:28px; letter-spacing:-.5px; margin-bottom:4px; }
+  .page-header p { color:var(--muted); font-size:14px; }
+
+
+
+  /* Grid de cards */
+  .projetistas-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+
+  .projetista-card {
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:24px; cursor:pointer; transition:border-color .2s, transform .15s;
+    text-decoration:none; color:inherit; display:block;
+    animation:fadeUp .3s ease both;
+  }
+  .projetista-card:hover { border-color:rgba(240,165,0,.3); transform:translateY(-2px); }
+
+  .card-top { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+  .card-avatar { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'DM Serif Display',serif; font-size:18px; font-weight:400; flex-shrink:0; }
+  .card-nome { font-size:15px; font-weight:500; margin-bottom:3px; }
+  .card-crea { font-size:12px; color:var(--muted); }
+
+  .card-stats { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:16px; }
+  .stat-mini { background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:8px; padding:10px 12px; min-width:0; }
+  .stat-mini__val { font-family:'DM Serif Display',serif; font-size:20px; line-height:1; margin-bottom:3px; }
+  .stat-mini__label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .card-faixa { display:flex; align-items:center; gap:8px; }
+  .faixa-bar { flex:1; height:5px; background:var(--border); border-radius:3px; overflow:hidden; }
+  .faixa-bar__fill { height:100%; border-radius:3px; transition:width .6s ease; }
+  .faixa-tag { font-size:10px; font-weight:500; padding:2px 8px; border-radius:20px; white-space:nowrap; }
+  .tag--otimo   { color:var(--success); background:rgba(61,186,126,.1); }
+  .tag--regular { color:var(--info);    background:rgba(74,158,221,.1); }
+  .tag--atencao { color:var(--accent);  background:rgba(240,165,0,.1); }
+  .tag--critico { color:var(--danger);  background:rgba(224,82,82,.1); }
+
+  .rank-badge { margin-left:auto; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; flex-shrink:0; }
+  .rank--1 { background:rgba(224,82,82,.15);  color:var(--danger); }
+  .rank--2 { background:rgba(240,165,0,.12);  color:var(--accent); }
+  .rank--3 { background:rgba(74,158,221,.12); color:var(--info); }
+  .rank--n { background:rgba(255,255,255,.05); color:var(--muted); }
+
+  
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .projetista-card:nth-child(1){animation-delay:.05s}
+  .projetista-card:nth-child(2){animation-delay:.10s}
+  .projetista-card:nth-child(3){animation-delay:.15s}
+  .projetista-card:nth-child(4){animation-delay:.20s}
+  .projetista-card:nth-child(5){animation-delay:.25s}
+
+  @media(max-width:768px){ .page{padding:20px 16px 48px;} .topbar{padding:0 16px; gap:16px;} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="dashboard.html" class="topbar__logo">Gestão<span>Q</span></a>
+    <nav class="topbar__nav">
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="projetos.html" class="nav-link">Projetos</a>
+    <a href="projetistas.html" class="nav-link active">Projetistas</a>
+    <a href="categorias.html" class="nav-link">Classificação de erros</a>
+    <a href="usuarios.html" class="nav-link">Usuários</a>
+  </nav>
+    <div class="topbar__right">
+    <div class="topbar__user">
+      <span class="badge-admin">Admin</span>
+      <span style="color:var(--text);font-size:13px;">kaua.soares</span>
+      <div class="avatar">KS</div>
+    </div>
+  </div>
+</header>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="page-header">
+    <div>
+      <h1>Projetistas</h1>
+      <p>Visão geral de desempenho · Erros por projeto</p>
+    </div>
+  </div>
+
+
+
+  <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:14px;">Desempenho geral</div>
+  <div class="projetistas-grid" id="grid"></div>
+
+</main>
+
+<script>
+  const dados = [
+    { id:1, nome:'Carlos Mendes',  iniciais:'CM', cor:'#e05252', corBg:'rgba(224,82,82,.15)',  erros:47, projetos:6,  naoConformes:4 },
+    { id:2, nome:'Ana Souza',      iniciais:'AS', cor:'#f0a500', corBg:'rgba(240,165,0,.15)',  erros:54, projetos:8,  naoConformes:3 },
+    { id:3, nome:'Roberto Lima',   iniciais:'RL', cor:'#4a9edd', corBg:'rgba(74,158,221,.15)', erros:61, projetos:9,  naoConformes:5 },
+    { id:4, nome:'Fernanda Costa', iniciais:'FC', cor:'#b07ddd', corBg:'rgba(176,125,221,.15)',erros:32, projetos:5,  naoConformes:2 },
+    { id:5, nome:'Paulo Ferreira', iniciais:'PF', cor:'#3dba7e', corBg:'rgba(61,186,126,.15)', erros:78, projetos:10, naoConformes:1 },
+    { id:6, nome:'Juliana Ramos',  iniciais:'JR', cor:'#4a9edd', corBg:'rgba(74,158,221,.15)', erros:19, projetos:3,  naoConformes:0 },
+    { id:7, nome:'Marcelo Dias',   iniciais:'MD', cor:'#f07830', corBg:'rgba(240,120,48,.15)',  erros:88, projetos:11, naoConformes:6 },
+    { id:8, nome:'Renata Pires',   iniciais:'RP', cor:'#3dba7e', corBg:'rgba(61,186,126,.15)', erros:25, projetos:4,  naoConformes:1 },
+  ];
+
+  // Classificação por erros/projeto — faixas fixas
+  // 0.0–5.0 = Crítico | 5.0–6.5 = Atenção | 6.5–8.0 = Regular | 8.0–10.0 = Ótimo
+  function classificar(ratio) {
+    if (ratio <= 5.0) return { tag:'Crítico', cls:'tag--critico', cor:'#e05252' };
+    if (ratio <= 6.5) return { tag:'Atenção', cls:'tag--atencao', cor:'#f0a500' };
+    if (ratio <= 8.0) return { tag:'Regular', cls:'tag--regular', cor:'#4a9edd' };
+    return                  { tag:'Ótimo',   cls:'tag--otimo',   cor:'#3dba7e' };
+  }
+
+  // Largura da barra proporcional à faixa (0–10)
+  function barPct(ratio) { return Math.min(100, Math.round((ratio / 10) * 100)); }
+
+  function rankClass(r) {
+    if (r === 1) return 'rank--1';
+    if (r === 2) return 'rank--2';
+    if (r === 3) return 'rank--3';
+    return 'rank--n';
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('grid');
+    // Ordena do pior para o melhor (menor ratio = mais crítico = rank 1º)
+    const sorted = [...dados].sort((a,b) => a.erros/a.projetos - b.erros/b.projetos).map((d,i) => ({ ...d, rank:i+1 }));
+    grid.innerHTML = sorted.map(d => {
+      const ratio = d.erros / d.projetos;
+      const cl  = classificar(ratio);
+      const pct = barPct(ratio);
+      return `
+        <a class="projetista-card" href="projetista-perfil.html">
+          <div class="card-top">
+            <div class="card-avatar" style="background:${d.corBg};color:${d.cor};">${d.iniciais}</div>
+            <div>
+              <div class="card-nome">${d.nome}</div>
+            </div>
+            <div class="rank-badge ${rankClass(d.rank)}">${d.rank}º</div>
+          </div>
+          <div class="card-stats">
+            <div class="stat-mini">
+              <div class="stat-mini__val">${d.erros}</div>
+              <div class="stat-mini__label">Erros</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini__val">${d.projetos}</div>
+              <div class="stat-mini__label">Projetos</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini__val" style="color:${cl.cor};">${ratio.toFixed(1)}</div>
+              <div class="stat-mini__label">Erros / proj</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini__val" style="color:${d.naoConformes > 0 ? 'var(--danger)' : 'var(--success)'};">${d.naoConformes}</div>
+              <div class="stat-mini__label">Não conforme</div>
+            </div>
+          </div>
+          <div class="card-faixa">
+            <div class="faixa-bar">
+              <div class="faixa-bar__fill" style="width:${pct}%;background:${cl.cor};"></div>
+            </div>
+            <span class="faixa-tag ${cl.cls}">${cl.tag}</span>
+          </div>
+        </a>`;
+    }).join('');
+  }
+
+  renderGrid();
+</script>
