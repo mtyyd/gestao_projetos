@@ -4,8 +4,8 @@
 // Supabase → Settings → API
 // ============================================================
 
-const SUPABASE_URL = 'COLE_SUA_PROJECT_URL_AQUI';
-const SUPABASE_KEY = 'COLE_SUA_ANON_KEY_AQUI';
+const SUPABASE_URL = 'https://uvldmqhdosdfbwlvbxlc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Txr2b4sZOOxk6MlNoQMbxg_dmj5jJO0';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
