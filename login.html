@@ -112,8 +112,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <script>
-  // Se já há sessão ativa, redirecionar direto
-  if (Sessao.obter()) window.location.href = 'dashboard.html';
+  // Limpar sessão anterior ao abrir o login — sempre exige novo login
+  Sessao.encerrarSilencioso();
 
   const form = document.getElementById('loginForm');
   const btn  = document.getElementById('loginBtn');
