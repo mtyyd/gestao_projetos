@@ -6,7 +6,7 @@
 <title>GestãoQ — Novo Comissionamento</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
   :root {
     --bg:#0d1117; --panel:#13191f; --border:#1e2832;
     --accent:#f0a500; --accent2:#e07b00;
@@ -27,7 +27,9 @@
   .topbar__right { display:flex; align-items:center; gap:16px; margin-left:auto; }
   .topbar__user { display:flex; align-items:center; gap:10px; font-size:13px; }
   .avatar { width:32px; height:32px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:500; color:#0d1117; }
-  .badge-admin { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.6px; background:rgba(240,165,0,.12); color:var(--accent); border:1px solid rgba(240,165,0,.2); border-radius:4px; padding:2px 7px; }
+  .badge-perfil { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.6px; background:rgba(240,165,0,.12); color:var(--accent); border:1px solid rgba(240,165,0,.2); border-radius:4px; padding:2px 7px; }
+  .btn-sair { padding:5px 12px; background:transparent; color:var(--muted); border:1px solid var(--border); border-radius:6px; font-family:'DM Sans',sans-serif; font-size:12px; cursor:pointer; transition:all .2s; }
+  .btn-sair:hover { color:var(--danger); border-color:var(--danger); }
 
   .page { position:relative; z-index:1; max-width:800px; margin:0 auto; padding:32px 32px 64px; }
   .breadcrumb { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); margin-bottom:24px; }
@@ -46,15 +48,11 @@
   .form-grid--full { grid-template-columns:1fr; }
   .field { display:flex; flex-direction:column; gap:8px; }
   .field label { font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); }
-  .field input, .field select {
-    background:var(--input-bg); border:1px solid var(--border); border-radius:8px;
-    padding:12px 14px; color:var(--text); font-family:'DM Sans',sans-serif;
-    font-size:14px; outline:none; transition:border-color .2s; width:100%;
-  }
+  .field input, .field select { background:var(--input-bg); border:1px solid var(--border); border-radius:8px; padding:12px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; transition:border-color .2s; width:100%; }
   .field input:focus, .field select:focus { border-color:var(--accent); }
   .field input::placeholder { color:var(--muted); }
   .field select option { background:var(--panel); }
-  .field select:disabled { opacity:0.4; cursor:not-allowed; }
+  .field select:disabled { opacity:.4; cursor:not-allowed; }
   .field__hint { font-size:12px; color:var(--muted); }
   .field input.error, .field select.error { border-color:var(--danger); }
   .field__error { font-size:12px; color:var(--danger); display:none; }
@@ -71,9 +69,11 @@
   .spinner { width:18px; height:18px; border:2px solid rgba(13,17,23,.3); border-top-color:#0d1117; border-radius:50%; animation:spin .7s linear infinite; }
   .success-msg { display:none; align-items:center; gap:10px; background:rgba(61,186,126,.1); border:1px solid rgba(61,186,126,.25); border-radius:8px; padding:14px 18px; font-size:14px; color:var(--success); margin-bottom:24px; }
   .success-msg.visible { display:flex; }
+  .error-msg { display:none; align-items:center; gap:10px; background:rgba(224,82,82,.1); border:1px solid rgba(224,82,82,.3); border-radius:8px; padding:14px 18px; font-size:14px; color:var(--danger); margin-bottom:24px; }
+  .error-msg.visible { display:flex; }
 
   @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes spin { to{transform:rotate(360deg)} }
+  @keyframes spin   { to{transform:rotate(360deg)} }
   @media(max-width:600px){ .page{padding:20px 16px 48px;} .form-grid{grid-template-columns:1fr;} .topbar{padding:0 16px;gap:16px;} }
 </style>
 </head>
@@ -90,10 +90,11 @@
   </nav>
   <div class="topbar__right">
     <div class="topbar__user">
-      <span class="badge-admin">Admin</span>
-      <span style="color:var(--text);font-size:13px;">kaua.soares</span>
-      <div class="avatar">KS</div>
+      <span class="badge-perfil" id="badgePerfil">—</span>
+      <span style="color:var(--text);font-size:13px;" id="nomeUsuario">—</span>
+      <div class="avatar" id="avatarUsuario">—</div>
     </div>
+    <button class="btn-sair" onclick="Sessao.encerrar()">Sair</button>
   </div>
 </header>
 
@@ -110,21 +111,21 @@
     <p>Preencha os dados para cadastrar um novo comissionamento</p>
   </div>
 
+  <div class="error-msg"   id="errorMsg">Erro ao salvar. Verifique os dados e tente novamente.</div>
   <div class="success-msg" id="successMsg">
     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-    Comissionamento cadastrado com sucesso! Redirecionando…
+    Comissionamento cadastrado! Redirecionando para registro de erros…
   </div>
 
   <div class="form-card">
     <form id="formProjeto" novalidate>
 
-      <!-- IDENTIFICAÇÃO -->
       <div class="form-section">
         <div class="form-section__title">Identificação</div>
         <div class="form-grid">
           <div class="field">
             <label for="codigo">Número da NS *</label>
-            <input type="text" id="codigo" placeholder="Ex: 2000075613" maxlength="10" inputmode="numeric" pattern="[0-9]*" />
+            <input type="text" id="codigo" placeholder="Ex: 2000075613" maxlength="10" inputmode="numeric" />
             <span class="field__error" id="err-codigo">Informe o número da NS.</span>
           </div>
           <div class="field">
@@ -135,7 +136,6 @@
         </div>
       </div>
 
-      <!-- RESPONSÁVEL E REDE -->
       <div class="form-section">
         <div class="form-section__title">Responsável e rede</div>
         <div class="form-grid">
@@ -160,14 +160,7 @@
           <div class="field">
             <label for="projetista">Projetista responsável *</label>
             <select id="projetista">
-              <option value="">Selecionar projetista…</option>
-              <option value="1">Carlos Mendes</option>
-              <option value="2">Ana Souza</option>
-              <option value="3">Roberto Lima</option>
-              <option value="4">Fernanda Costa</option>
-              <option value="5">Paulo Ferreira</option>
-              <option value="6">Juliana Ramos</option>
-              <option value="7">Marcelo Dias</option>
+              <option value="">Carregando projetistas…</option>
             </select>
             <div class="field__hint">Apenas projetistas ativos · Gerenciados em <a href="usuarios.html" style="color:var(--accent);text-decoration:none;">Usuários → Projetistas</a></div>
             <span class="field__error" id="err-projetista">Selecione o projetista responsável.</span>
@@ -175,14 +168,13 @@
         </div>
       </div>
 
-      <!-- PRAZO -->
       <div class="form-section">
         <div class="form-section__title">Entrega</div>
         <div class="form-grid">
           <div class="field">
             <label for="entrega">Data do Levantamento *</label>
             <input type="date" id="entrega" />
-            <span class="field__error" id="err-entrega">Informe a data de entrega.</span>
+            <span class="field__error" id="err-entrega">Informe a data do levantamento.</span>
           </div>
         </div>
       </div>
@@ -200,88 +192,104 @@
 
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 <script>
-  // ── CAMPO NS: apenas números, max 10 ─────────────────────
-  document.getElementById('codigo').addEventListener('input', function() {
-    this.value = this.value.replace(/\D/g, '').slice(0, 10);
-  });
+  // ── PROTEÇÃO DE ROTA ─────────────────────────────────────
+  const usuario = Sessao.exigir();
+  document.getElementById('nomeUsuario').textContent  = usuario.usuario;
+  document.getElementById('badgePerfil').textContent  = usuario.perfil;
+  document.getElementById('avatarUsuario').textContent =
+    usuario.nome.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
 
-  // ── CAMPO CIDADE: apenas letras e espaços, caixa alta ────
-  document.getElementById('nome').addEventListener('input', function() {
-    const pos = this.selectionStart;
-    this.value = this.value
-      .replace(/[^a-zA-ZÀ-ÿ\s]/g, '')
-      .toUpperCase();
-    this.setSelectionRange(pos, pos);
-  });
+  // Leitor não pode cadastrar
+  if (usuario.perfil === 'leitor') window.location.href = 'projetos.html';
+
+  // ── CARREGAR PROJETISTAS DO BANCO ────────────────────────
+  async function carregarProjetistas() {
+    const { data, error } = await db
+      .from('projetistas')
+      .select('id, nome')
+      .eq('ativo', true)
+      .order('nome');
+
+    const sel = document.getElementById('projetista');
+    if (error || !data || data.length === 0) {
+      sel.innerHTML = '<option value="">Nenhum projetista cadastrado</option>';
+      return;
+    }
+    sel.innerHTML = '<option value="">Selecionar projetista…</option>' +
+      data.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+  }
+
+  carregarProjetistas();
 
   // ── TIPO DE ATENDIMENTO DINÂMICO ─────────────────────────
   const selCliente = document.getElementById('tipoCliente');
   const selTipo    = document.getElementById('tipo');
 
   const opcoesExterno = [
-    { value: 'MT/BT-AEREO',          text: 'MT/BT — Aéreo' },
-    { value: 'RAMAL-SUB',             text: 'Ramal Sub' },
-    { value: 'RAMAL-MT',              text: 'Ramal MT' },
+    { value:'MT/BT-AEREO',         text:'MT/BT — Aéreo' },
+    { value:'RAMAL-SUB',           text:'Ramal Sub' },
+    { value:'RAMAL-MT',            text:'Ramal MT' },
   ];
   const opcoesInterno = [
-    { value: 'MELHORIA-OPERATIVA',    text: 'Melhoria operativa' },
-    { value: 'EXPANSAO-ALIMENTADOR',  text: 'Expansão de alimentador' },
+    { value:'MELHORIA-OPERATIVA',   text:'Melhoria operativa' },
+    { value:'EXPANSAO-ALIMENTADOR', text:'Expansão de alimentador' },
   ];
 
   selCliente.addEventListener('change', function() {
-    // Limpar e resetar
     selTipo.innerHTML = '';
     selTipo.disabled  = false;
-
     const opcoes = this.value === 'externo' ? opcoesExterno
-                 : this.value === 'interno' ? opcoesInterno
-                 : null;
-
+                 : this.value === 'interno' ? opcoesInterno : null;
     if (opcoes) {
-      const placeholder = document.createElement('option');
-      placeholder.value = '';
-      placeholder.textContent = 'Selecionar tipo…';
-      selTipo.appendChild(placeholder);
+      const ph = document.createElement('option');
+      ph.value = ''; ph.textContent = 'Selecionar tipo…';
+      selTipo.appendChild(ph);
       opcoes.forEach(({ value, text }) => {
         const opt = document.createElement('option');
-        opt.value = value;
-        opt.textContent = text;
+        opt.value = value; opt.textContent = text;
         selTipo.appendChild(opt);
       });
     } else {
       selTipo.disabled = true;
-      const placeholder = document.createElement('option');
-      placeholder.value = '';
-      placeholder.textContent = 'Selecione o tipo de cliente primeiro…';
-      selTipo.appendChild(placeholder);
+      const ph = document.createElement('option');
+      ph.value = ''; ph.textContent = 'Selecione o tipo de cliente primeiro…';
+      selTipo.appendChild(ph);
     }
-
-    // Limpar erros
     selTipo.classList.remove('error');
     document.getElementById('err-tipo').classList.remove('visible');
   });
 
   // ── VALIDAÇÃO ────────────────────────────────────────────
-  const form = document.getElementById('formProjeto');
-  const btn  = document.getElementById('btnSalvar');
-
   const campos = [
-    { id: 'codigo',      err: 'err-codigo' },
-    { id: 'nome',        err: 'err-nome' },
-    { id: 'tipoCliente', err: 'err-tipoCliente' },
-    { id: 'projetista',  err: 'err-projetista' },
-    { id: 'tipo',        err: 'err-tipo' },
-    { id: 'entrega',     err: 'err-entrega' },
+    { id:'codigo',      err:'err-codigo' },
+    { id:'nome',        err:'err-nome' },
+    { id:'tipoCliente', err:'err-tipoCliente' },
+    { id:'tipo',        err:'err-tipo' },
+    { id:'projetista',  err:'err-projetista' },
+    { id:'entrega',     err:'err-entrega' },
   ];
 
   campos.forEach(({ id }) => {
     document.getElementById(id).addEventListener('change', () => {
       document.getElementById(id).classList.remove('error');
-      const errId = 'err-' + id;
-      if (document.getElementById(errId))
-        document.getElementById(errId).classList.remove('visible');
+      const e = document.getElementById('err-' + id);
+      if (e) e.classList.remove('visible');
     });
+  });
+
+  // NS: apenas números
+  document.getElementById('codigo').addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '').slice(0, 10);
+  });
+
+  // Cidade: apenas letras, caixa alta
+  document.getElementById('nome').addEventListener('input', function() {
+    const pos = this.selectionStart;
+    this.value = this.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '').toUpperCase();
+    this.setSelectionRange(pos, pos);
   });
 
   function validar() {
@@ -290,58 +298,64 @@
       const el    = document.getElementById(id);
       const errEl = document.getElementById(err);
       if (!el.value.trim()) {
-        el.classList.add('error');
-        errEl.classList.add('visible');
-        ok = false;
+        el.classList.add('error'); errEl.classList.add('visible'); ok = false;
       } else {
-        el.classList.remove('error');
-        errEl.classList.remove('visible');
+        el.classList.remove('error'); errEl.classList.remove('visible');
       }
     });
     return ok;
   }
 
   // ── SUBMIT ───────────────────────────────────────────────
+  const form = document.getElementById('formProjeto');
+  const btn  = document.getElementById('btnSalvar');
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    document.getElementById('errorMsg').classList.remove('visible');
     if (!validar()) return;
 
-    btn.classList.add('loading');
-    btn.disabled = true;
+    btn.classList.add('loading'); btn.disabled = true;
 
-    // Salvar dados no localStorage para uso em projeto-erros
     const projetistaEl = document.getElementById('projetista');
     const tipoEl       = document.getElementById('tipo');
     const clienteEl    = document.getElementById('tipoCliente');
+    const ns           = document.getElementById('codigo').value.trim();
+    const cidade       = document.getElementById('nome').value.trim();
 
-    const dadosComissionamento = {
-      ns:          document.getElementById('codigo').value.trim(),
-      cidade:      document.getElementById('nome').value.trim(),
+    const { data, error } = await db.from('projetos').insert([{
+      ns,
+      cidade,
+      projetista_id:    projetistaEl.value,
+      tipo_cliente:     clienteEl.value,
+      tipo_atendimento: tipoEl.options[tipoEl.selectedIndex].text,
+      data_levantamento: document.getElementById('entrega').value,
+      criado_por:       usuario.id,
+    }]).select('id').single();
+
+    if (error) {
+      console.error(error);
+      const errMsg = document.getElementById('errorMsg');
+      errMsg.textContent = error.code === '23505'
+        ? `NS ${ns} já está cadastrada.`
+        : 'Erro ao salvar. Tente novamente.';
+      errMsg.classList.add('visible');
+      btn.classList.remove('loading'); btn.disabled = false;
+      return;
+    }
+
+    // Salvar dados no localStorage para uso em projeto-erros
+    localStorage.setItem('gestaoq_comissionamento', JSON.stringify({
+      id:          data.id,
+      ns,
+      cidade,
       projetista:  projetistaEl.options[projetistaEl.selectedIndex].text,
       tipoCliente: clienteEl.options[clienteEl.selectedIndex].text,
       atendimento: tipoEl.options[tipoEl.selectedIndex].text,
-    };
-    localStorage.setItem('gestaoq_comissionamento', JSON.stringify(dadosComissionamento));
+    }));
 
-    // ── CONEXÃO SUPABASE ──────────────────────────────────
-    // const { data, error } = await supabase.from('projetos').insert([{
-    //   codigo:        dadosComissionamento.ns,
-    //   nome:          dadosComissionamento.cidade,
-    //   projetista_id: document.getElementById('projetista').value,
-    //   tipo_rede:     dadosComissionamento.atendimento,
-    //   data_entrega:  document.getElementById('entrega').value,
-    //   criado_por:    (await supabase.auth.getUser()).data.user.id,
-    // }])
-    // ─────────────────────────────────────────────────────
-
-    await new Promise(r => setTimeout(r, 1200));
-
-    btn.classList.remove('loading');
-    btn.disabled = false;
     document.getElementById('successMsg').classList.add('visible');
-    form.reset();
-    selTipo.disabled = true;
-    selTipo.innerHTML = '<option value="">Selecione o tipo de cliente primeiro…</option>';
+    btn.classList.remove('loading'); btn.disabled = false;
 
     setTimeout(() => { window.location.href = 'projeto-erros.html'; }, 1800);
   });
