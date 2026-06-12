@@ -17,7 +17,6 @@
   html,body { min-height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:15px; }
   body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px); background-size:48px 48px; opacity:.25; pointer-events:none; z-index:0; }
 
-  /* TOPBAR */
   .topbar { position:sticky; top:0; z-index:100; background:rgba(13,17,23,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 32px; height:60px; gap:32px; }
   .topbar__logo { font-family:'DM Serif Display',serif; font-size:18px; color:var(--text); text-decoration:none; margin-right:16px; }
   .topbar__logo span { color:var(--accent); }
@@ -28,24 +27,22 @@
   .topbar__right { display:flex; align-items:center; gap:16px; margin-left:auto; }
   .topbar__user { display:flex; align-items:center; gap:10px; font-size:13px; }
   .avatar { width:32px; height:32px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:500; color:#0d1117; }
-  .badge-admin { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.6px; background:rgba(240,165,0,.12); color:var(--accent); border:1px solid rgba(240,165,0,.2); border-radius:4px; padding:2px 7px; }
+  .badge-perfil { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.6px; background:rgba(240,165,0,.12); color:var(--accent); border:1px solid rgba(240,165,0,.2); border-radius:4px; padding:2px 7px; }
+  .btn-sair { padding:5px 12px; background:transparent; color:var(--muted); border:1px solid var(--border); border-radius:6px; font-family:'DM Sans',sans-serif; font-size:12px; cursor:pointer; transition:all .2s; }
+  .btn-sair:hover { color:var(--danger); border-color:var(--danger); }
 
-  /* PAGE */
   .page { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:32px 32px 64px; }
   .page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; gap:16px; }
   .page-header h1 { font-family:'DM Serif Display',serif; font-size:28px; letter-spacing:-.5px; margin-bottom:4px; }
   .page-header p { color:var(--muted); font-size:14px; }
 
-  /* ABAS */
   .tabs { display:flex; gap:4px; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:4px; margin-bottom:24px; width:fit-content; }
   .tab { padding:8px 22px; border-radius:7px; font-size:14px; font-weight:500; color:var(--muted); cursor:pointer; transition:all .2s; border:none; background:transparent; font-family:'DM Sans',sans-serif; }
   .tab:hover { color:var(--text); }
   .tab.active { background:rgba(240,165,0,.1); color:var(--accent); border:1px solid rgba(240,165,0,.2); }
-
   .tab-panel { display:none; }
   .tab-panel.active { display:block; animation:fadeUp .25s ease both; }
 
-  /* TOOLBAR */
   .toolbar { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
   .search-wrap { position:relative; flex:1; max-width:320px; }
   .search-wrap svg { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--muted); }
@@ -55,13 +52,11 @@
   .btn-primary { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--accent); color:#0d1117; border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:background .2s; margin-left:auto; }
   .btn-primary:hover { background:var(--accent2); }
 
-  /* TABELA */
   .table-card { background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
   table { width:100%; border-collapse:collapse; }
   thead th { padding:11px 20px; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); text-align:left; background:rgba(255,255,255,.02); border-bottom:1px solid var(--border); }
   tbody td { padding:14px 20px; font-size:14px; border-bottom:1px solid rgba(30,40,50,.6); vertical-align:middle; }
   tbody tr:last-child td { border-bottom:none; }
-  tbody tr { transition:background .15s; }
   tbody tr:hover { background:rgba(255,255,255,.02); }
 
   .user-cell { display:flex; align-items:center; gap:10px; }
@@ -72,10 +67,9 @@
   .pill--ativo   { color:var(--success); background:rgba(61,186,126,.1); }
   .pill--inativo { color:var(--muted);   background:rgba(107,122,141,.1); }
 
-  .perfil-badge { font-size:11px; font-weight:500; padding:2px 9px; border-radius:4px; }
-  .perfil--admin  { color:var(--accent);  background:rgba(240,165,0,.1);   border:1px solid rgba(240,165,0,.2); }
-  .perfil--editor { color:var(--info);    background:rgba(74,158,221,.1);  border:1px solid rgba(74,158,221,.2); }
-  .perfil--leitor { color:var(--muted);   background:rgba(107,122,141,.08);border:1px solid var(--border); }
+  .perfil--admin  { color:var(--accent);  background:rgba(240,165,0,.1);   border:1px solid rgba(240,165,0,.2);   font-size:11px; font-weight:500; padding:2px 9px; border-radius:4px; }
+  .perfil--editor { color:var(--info);    background:rgba(74,158,221,.1);  border:1px solid rgba(74,158,221,.2);  font-size:11px; font-weight:500; padding:2px 9px; border-radius:4px; }
+  .perfil--leitor { color:var(--muted);   background:rgba(107,122,141,.08);border:1px solid var(--border);        font-size:11px; font-weight:500; padding:2px 9px; border-radius:4px; }
 
   .action-btns { display:flex; gap:6px; }
   .btn-action { width:28px; height:28px; display:flex; align-items:center; justify-content:center; border:none; border-radius:6px; cursor:pointer; background:transparent; color:var(--muted); transition:all .15s; }
@@ -98,15 +92,14 @@
   .mfield input::placeholder { color:var(--muted); }
   .mfield select option { background:var(--panel); }
   .mfield input.err { border-color:var(--danger); }
-  .mfield__hint { font-size:11px; color:var(--muted); margin-top:5px; }
   .mfield__row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .mfield__hint { font-size:11px; color:var(--muted); margin-top:5px; }
   .modal__actions { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; padding-top:18px; border-top:1px solid var(--border); }
   .btn-cancel { padding:8px 16px; background:transparent; color:var(--muted); border:1px solid var(--border); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:all .2s; }
   .btn-cancel:hover { color:var(--text); border-color:var(--muted); }
   .btn-confirm { padding:8px 20px; background:var(--accent); color:#0d1117; border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:background .2s; }
   .btn-confirm:hover { background:var(--accent2); }
 
-  /* TOAST */
   .toast { position:fixed; bottom:24px; right:24px; z-index:400; background:var(--success); color:#0d1117; padding:11px 18px; border-radius:8px; font-size:13px; font-weight:500; display:flex; align-items:center; gap:8px; transform:translateY(60px); opacity:0; transition:all .25s; pointer-events:none; }
   .toast.visible { transform:translateY(0); opacity:1; }
 
@@ -118,104 +111,85 @@
 
 <header class="topbar">
   <a href="dashboard.html" class="topbar__logo">Gestão<span>Q</span></a>
-    <nav class="topbar__nav">
-    <a href="dashboard.html" class="nav-link">Dashboard</a>
-    <a href="projetos.html" class="nav-link">Projetos</a>
+  <nav class="topbar__nav">
+    <a href="dashboard.html"   class="nav-link">Dashboard</a>
+    <a href="projetos.html"    class="nav-link">Projetos</a>
     <a href="projetistas.html" class="nav-link">Projetistas</a>
-    <a href="categorias.html" class="nav-link">Classificação de erros</a>
-    <a href="usuarios.html" class="nav-link active">Usuários</a>
+    <a href="categorias.html"  class="nav-link">Classificação de erros</a>
+    <a href="usuarios.html"    class="nav-link active">Usuários</a>
   </nav>
-    <div class="topbar__right">
+  <div class="topbar__right">
     <div class="topbar__user">
-      <span class="badge-admin">Admin</span>
-      <span style="color:var(--text);font-size:13px;">kaua.soares</span>
-      <div class="avatar">KS</div>
+      <span class="badge-perfil" id="badgePerfil">—</span>
+      <span style="color:var(--text);font-size:13px;" id="nomeUsuario">—</span>
+      <div class="avatar" id="avatarUsuario">—</div>
     </div>
-  </div>
-</header>
+    <button class="btn-sair" onclick="Sessao.encerrar()">Sair</button>
   </div>
 </header>
 
 <main class="page">
-
   <div class="page-header">
     <div>
       <h1>Usuários</h1>
-      <p>Gerencie comissionadores com acesso ao sistema e projetistas vinculados aos projetos</p>
+      <p>Gerencie comissionadores e projetistas do sistema</p>
     </div>
   </div>
 
-  <!-- ABAS -->
   <div class="tabs">
     <button class="tab active" onclick="mudarAba('comissionadores')">Comissionadores</button>
     <button class="tab"        onclick="mudarAba('projetistas')">Projetistas</button>
   </div>
 
-  <!-- ABA: COMISSIONADORES -->
+  <!-- ABA COMISSIONADORES -->
   <div class="tab-panel active" id="panel-comissionadores">
     <div class="toolbar">
       <div class="search-wrap">
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Buscar comissionador…" oninput="filtrarTabela('tbComissionadores', this.value)">
+        <input type="text" placeholder="Buscar comissionador…" oninput="filtrarTabela('tbComissionadores',this.value)">
       </div>
-      <button class="btn-primary" onclick="abrirModal('comissionador')">
+      <button class="btn-primary" onclick="abrirModalC()">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         Novo comissionador
       </button>
     </div>
     <div class="table-card">
       <table>
-        <thead>
-          <tr>
-            <th>Comissionador</th>
-            <th>Usuário</th>
-            <th>Perfil</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tbComissionadores"></tbody>
+        <thead><tr><th>Comissionador</th><th>Usuário</th><th>Perfil</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody id="tbComissionadores"><tr class="empty-row"><td colspan="5">Carregando…</td></tr></tbody>
       </table>
     </div>
   </div>
 
-  <!-- ABA: PROJETISTAS -->
+  <!-- ABA PROJETISTAS -->
   <div class="tab-panel" id="panel-projetistas">
     <div class="toolbar">
       <div class="search-wrap">
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Buscar projetista…" oninput="filtrarTabela('tbProjetistas', this.value)">
+        <input type="text" placeholder="Buscar projetista…" oninput="filtrarTabela('tbProjetistas',this.value)">
       </div>
-      <button class="btn-primary" onclick="abrirModal('projetista')">
+      <button class="btn-primary" onclick="abrirModalP()">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         Novo projetista
       </button>
     </div>
     <div class="table-card">
       <table>
-        <thead>
-          <tr>
-            <th>Projetista</th>
-            <th>Equipe</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tbProjetistas"></tbody>
+        <thead><tr><th>Projetista</th><th>Equipe</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody id="tbProjetistas"><tr class="empty-row"><td colspan="4">Carregando…</td></tr></tbody>
       </table>
     </div>
     <div style="margin-top:12px;padding:12px 16px;background:rgba(74,158,221,.06);border:1px solid rgba(74,158,221,.15);border-radius:8px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;">
       <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--info);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-      Projetistas <strong style="color:var(--text);">não possuem acesso ao sistema</strong>. Eles aparecem apenas nos campos de seleção do cadastro de projetos. Somente projetistas ativos aparecem para novos projetos.
+      Projetistas <strong style="color:var(--text);">não possuem acesso ao sistema</strong>. Aparecem apenas nos campos de seleção do cadastro de projetos.
     </div>
   </div>
-
 </main>
 
 <!-- MODAL COMISSIONADOR -->
-<div class="modal-overlay" id="modalComissionador" onclick="fecharModal('modalComissionador', event)">
+<div class="modal-overlay" id="modalC" onclick="fecharModal('modalC',event)">
   <div class="modal">
-    <div class="modal__title" id="titleModalComissionador">Novo comissionador</div>
+    <div class="modal__title" id="titleModalC">Novo comissionador</div>
     <div class="modal__sub">Usuário com acesso ao sistema</div>
     <div class="mfield">
       <label>Nome completo *</label>
@@ -237,37 +211,38 @@
         </select>
       </div>
     </div>
-    <div class="mfield__row" style="margin-bottom:14px;">
+    <div class="mfield__row">
       <div class="mfield" style="margin-bottom:0;">
         <label>Senha (6 dígitos) *</label>
-        <input type="password" id="cSenha" placeholder="••••••" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" />
+        <input type="password" id="cSenha" placeholder="••••••" maxlength="6" inputmode="numeric" />
+        <div class="mfield__hint" id="senhaHint">Obrigatória no cadastro</div>
       </div>
       <div class="mfield" style="margin-bottom:0;">
         <label>Status</label>
         <select id="cStatus">
-          <option value="ativo">Ativo</option>
-          <option value="inativo">Inativo</option>
+          <option value="true">Ativo</option>
+          <option value="false">Inativo</option>
         </select>
       </div>
     </div>
     <div class="modal__actions">
-      <button class="btn-cancel" onclick="fecharModal('modalComissionador')">Cancelar</button>
+      <button class="btn-cancel" onclick="fecharModal('modalC')">Cancelar</button>
       <button class="btn-confirm" onclick="salvarComissionador()">Salvar</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL PROJETISTA -->
-<div class="modal-overlay" id="modalProjetista" onclick="fecharModal('modalProjetista', event)">
+<div class="modal-overlay" id="modalP" onclick="fecharModal('modalP',event)">
   <div class="modal">
-    <div class="modal__title" id="titleModalProjetista">Novo projetista</div>
+    <div class="modal__title" id="titleModalP">Novo projetista</div>
     <div class="modal__sub">Registro de referência — sem acesso ao sistema</div>
     <div class="mfield">
       <label>Nome completo *</label>
       <input type="text" id="pNome" placeholder="Ex: Carlos Mendes" />
     </div>
-    <div class="mfield__row" style="margin-bottom:0;">
-      <div class="mfield">
+    <div class="mfield__row">
+      <div class="mfield" style="margin-bottom:0;">
         <label>Equipe</label>
         <select id="pEquipe">
           <option value="">Selecionar…</option>
@@ -275,16 +250,16 @@
           <option value="EO">EO</option>
         </select>
       </div>
-      <div class="mfield">
+      <div class="mfield" style="margin-bottom:0;">
         <label>Status</label>
         <select id="pStatus">
-          <option value="ativo">Ativo</option>
-          <option value="inativo">Inativo</option>
+          <option value="true">Ativo</option>
+          <option value="false">Inativo</option>
         </select>
       </div>
     </div>
     <div class="modal__actions">
-      <button class="btn-cancel" onclick="fecharModal('modalProjetista')">Cancelar</button>
+      <button class="btn-cancel" onclick="fecharModal('modalP')">Cancelar</button>
       <button class="btn-confirm" onclick="salvarProjetista()">Salvar</button>
     </div>
   </div>
@@ -295,232 +270,242 @@
   <span id="toastMsg">Salvo!</span>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 <script>
-// ── ESTADO ───────────────────────────────────────────────────
-let comissionadores = [
-  { id:1, nome:'Kauã Soares',    usuario:'kaua.soares',  perfil:'admin',   status:'ativo'   },
-  { id:2, nome:'Thiago Almeida', usuario:'thiago.almeida', perfil:'editor', status:'ativo'   },
-  { id:3, nome:'Marina Lopes',   usuario:'marina.lopes',  perfil:'leitor', status:'ativo'   },
-  { id:4, nome:'Diego Faria',    usuario:'diego.faria',   perfil:'leitor', status:'inativo' },
-];
+  // ── PROTEÇÃO — apenas admin ───────────────────────────────
+  const usuario = Sessao.exigirAdmin();
+  document.getElementById('nomeUsuario').textContent  = usuario.usuario;
+  document.getElementById('badgePerfil').textContent  = usuario.perfil;
+  document.getElementById('avatarUsuario').textContent =
+    usuario.nome.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
 
-let projetistas = [
-  { id:1, nome:'Carlos Mendes',  equipe:'EI', status:'ativo'   },
-  { id:2, nome:'Ana Souza',      equipe:'EO',   status:'ativo'   },
-  { id:3, nome:'Roberto Lima',   equipe:'EI', status:'ativo'   },
-  { id:4, nome:'Fernanda Costa', equipe:'EI', status:'ativo'   },
-  { id:5, nome:'Paulo Ferreira', equipe:'EO',   status:'ativo'   },
-  { id:6, nome:'Juliana Ramos',  equipe:'EO', status:'ativo'   },
-  { id:7, nome:'Marcelo Dias',   equipe:'EI', status:'ativo'   },
-  { id:8, nome:'Renata Pires',   equipe:'EI', status:'inativo' },
-];
+  // ── ABAS ─────────────────────────────────────────────────
+  function mudarAba(aba) {
+    document.querySelectorAll('.tab').forEach((t,i) =>
+      t.classList.toggle('active', ['comissionadores','projetistas'][i] === aba));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + aba).classList.add('active');
+  }
 
-let proximoCId = 10, proximoPId = 10;
-let editandoC = null, editandoP = null;
+  function iniciais(nome) {
+    return nome.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
+  }
 
-// ── ABAS ──────────────────────────────────────────────────────
-function mudarAba(aba) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['comissionadores','projetistas'][i] === aba));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + aba).classList.add('active');
-}
+  const CORES = ['#e05252','#f0a500','#4a9edd','#3dba7e','#b07ddd','#f07830'];
+  const BGCORES = ['rgba(224,82,82,.15)','rgba(240,165,0,.15)','rgba(74,158,221,.15)','rgba(61,186,126,.15)','rgba(176,125,221,.15)','rgba(240,120,48,.15)'];
 
-// ── INICIAIS ─────────────────────────────────────────────────
-function iniciais(nome) { return nome.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase(); }
+  // ── COMISSIONADORES ──────────────────────────────────────
+  let editandoC = null;
 
-const CORES = ['#e05252','#f0a500','#4a9edd','#3dba7e','#b07ddd','#f07830'];
-const BGCORES = ['rgba(224,82,82,.15)','rgba(240,165,0,.15)','rgba(74,158,221,.15)','rgba(61,186,126,.15)','rgba(176,125,221,.15)','rgba(240,120,48,.15)'];
-function cor(id)  { return CORES[id % CORES.length]; }
-function bgCor(id){ return BGCORES[id % BGCORES.length]; }
+  async function carregarComissionadores() {
+    const { data } = await db.from('usuarios').select('*').order('nome');
+    renderComissionadores(data || []);
+  }
 
-// ── RENDER COMISSIONADORES ────────────────────────────────────
-function renderComissionadores() {
-  const tb = document.getElementById('tbComissionadores');
-  if (!comissionadores.length) { tb.innerHTML = `<tr class="empty-row"><td colspan="5">Nenhum comissionador cadastrado</td></tr>`; return; }
-  tb.innerHTML = comissionadores.map(u => `
-    <tr>
-      <td>
-        <div class="user-cell">
-          <div class="u-avatar" style="background:${bgCor(u.id)};color:${cor(u.id)};">${iniciais(u.nome)}</div>
-          <span>${u.nome}</span>
-        </div>
-      </td>
-      <td style="color:var(--muted);font-size:13px;font-family:monospace;">${u.usuario}</td>
-      <td><span class="perfil-badge perfil--${u.perfil}">${{admin:'Admin',editor:'Editor',leitor:'Leitor'}[u.perfil]||u.perfil}</span></td>
-      <td><span class="status-pill ${u.status==='ativo'?'pill--ativo':'pill--inativo'}">${u.status==='ativo'?'Ativo':'Inativo'}</span></td>
-      <td>
-        <div class="action-btns">
-          <button class="btn-action" onclick="editarComissionador(${u.id})" title="Editar">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-          </button>
-          <button class="btn-action del" onclick="removerComissionador(${u.id})" title="Remover">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-          </button>
-        </div>
-      </td>
-    </tr>`).join('');
-}
+  function renderComissionadores(lista) {
+    const tb = document.getElementById('tbComissionadores');
+    if (!lista.length) { tb.innerHTML = '<tr class="empty-row"><td colspan="5">Nenhum comissionador cadastrado</td></tr>'; return; }
+    tb.innerHTML = lista.map((u, i) => `
+      <tr>
+        <td><div class="user-cell"><div class="u-avatar" style="background:${BGCORES[i%6]};color:${CORES[i%6]};">${iniciais(u.nome)}</div><span>${u.nome}</span></div></td>
+        <td style="color:var(--muted);font-size:13px;font-family:monospace;">${u.usuario}</td>
+        <td><span class="perfil--${u.perfil}">${u.perfil}</span></td>
+        <td><span class="status-pill ${u.ativo?'pill--ativo':'pill--inativo'}">${u.ativo?'Ativo':'Inativo'}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-action" onclick="editarComissionador('${u.id}')" title="Editar">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button class="btn-action del" onclick="removerComissionador('${u.id}')" title="Remover">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
 
-// ── RENDER PROJETISTAS ────────────────────────────────────────
-function renderProjetistas() {
-  const tb = document.getElementById('tbProjetistas');
-  if (!projetistas.length) { tb.innerHTML = `<tr class="empty-row"><td colspan="4">Nenhum projetista cadastrado</td></tr>`; return; }
-  tb.innerHTML = projetistas.map(p => `
-    <tr>
-      <td>
-        <div class="user-cell">
-          <div class="u-avatar" style="background:${bgCor(p.id)};color:${cor(p.id)};">${iniciais(p.nome)}</div>
-          <span>${p.nome}</span>
-        </div>
-      </td>
-      <td style="color:var(--muted);font-size:13px;">${p.equipe || '—'}</td>
-      <td><span class="status-pill ${p.status==='ativo'?'pill--ativo':'pill--inativo'}">${p.status==='ativo'?'Ativo':'Inativo'}</span></td>
-      <td>
-        <div class="action-btns">
-          <button class="btn-action" onclick="editarProjetista(${p.id})" title="Editar">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-          </button>
-          <button class="btn-action" onclick="toggleStatusP(${p.id})" title="${p.status==='ativo'?'Desativar':'Ativar'}">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="${p.status==='ativo'?'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636':'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'}"/></svg>
-          </button>
-        </div>
-      </td>
-    </tr>`).join('');
-}
-
-// ── MODAIS ────────────────────────────────────────────────────
-function abrirModal(tipo) {
-  if (tipo === 'comissionador') {
+  function abrirModalC() {
     editandoC = null;
-    document.getElementById('titleModalComissionador').textContent = 'Novo comissionador';
+    document.getElementById('titleModalC').textContent = 'Novo comissionador';
     document.getElementById('cNome').value = '';
     document.getElementById('cUsuario').value = '';
     document.getElementById('cSenha').value = '';
     document.getElementById('cPerfil').value = '';
-    document.getElementById('cStatus').value = 'ativo';
-    document.getElementById('modalComissionador').classList.add('visible');
+    document.getElementById('cStatus').value = 'true';
+    document.getElementById('cSenha').required = true;
+    document.getElementById('senhaHint').textContent = 'Obrigatória no cadastro';
+    document.getElementById('modalC').classList.add('visible');
     setTimeout(() => document.getElementById('cNome').focus(), 180);
-  } else {
+  }
+
+  async function editarComissionador(id) {
+    const { data } = await db.from('usuarios').select('*').eq('id', id).single();
+    if (!data) return;
+    editandoC = id;
+    document.getElementById('titleModalC').textContent = 'Editar comissionador';
+    document.getElementById('cNome').value    = data.nome;
+    document.getElementById('cUsuario').value = data.usuario;
+    document.getElementById('cSenha').value   = '';
+    document.getElementById('cPerfil').value  = data.perfil;
+    document.getElementById('cStatus').value  = String(data.ativo);
+    document.getElementById('senhaHint').textContent = 'Deixe em branco para manter a senha atual';
+    document.getElementById('modalC').classList.add('visible');
+  }
+
+  async function salvarComissionador() {
+    const nome   = document.getElementById('cNome').value.trim();
+    const usr    = document.getElementById('cUsuario').value.trim();
+    const senha  = document.getElementById('cSenha').value;
+    const perfil = document.getElementById('cPerfil').value;
+    const ativo  = document.getElementById('cStatus').value === 'true';
+
+    if (!nome || !usr || !perfil) { mostrarToast('Preencha os campos obrigatórios.'); return; }
+    if (!editandoC && !/^\d{6}$/.test(senha)) { mostrarToast('A senha deve ter exatamente 6 números.'); return; }
+
+    if (editandoC) {
+      // Atualizar sem senha
+      const updates = { nome, usuario: usr, perfil, ativo };
+      const { error } = await db.from('usuarios').update(updates).eq('id', editandoC);
+      if (error) { mostrarToast('Erro ao atualizar.'); return; }
+
+      // Atualizar senha se preenchida
+      if (/^\d{6}$/.test(senha)) {
+        await db.rpc('atualizar_senha', { p_id: editandoC, p_senha: senha });
+      }
+      mostrarToast('Comissionador atualizado!');
+    } else {
+      // Criar via RPC que faz hash da senha
+      const { error } = await db.rpc('criar_usuario', {
+        p_nome: nome, p_usuario: usr, p_senha: senha, p_perfil: perfil
+      });
+      if (error) {
+        mostrarToast(error.message?.includes('unique') ? 'Usuário já existe.' : 'Erro ao cadastrar.');
+        return;
+      }
+      mostrarToast('Comissionador cadastrado!');
+    }
+
+    document.getElementById('modalC').classList.remove('visible');
+    editandoC = null;
+    carregarComissionadores();
+  }
+
+  async function removerComissionador(id) {
+    if (!confirm('Remover este comissionador?')) return;
+    const { error } = await db.from('usuarios').delete().eq('id', id);
+    if (error) { mostrarToast('Erro ao remover.'); return; }
+    mostrarToast('Comissionador removido.');
+    carregarComissionadores();
+  }
+
+  // ── PROJETISTAS ──────────────────────────────────────────
+  let editandoP = null;
+
+  async function carregarProjetistas() {
+    const { data } = await db.from('projetistas').select('*').order('nome');
+    renderProjetistas(data || []);
+  }
+
+  function renderProjetistas(lista) {
+    const tb = document.getElementById('tbProjetistas');
+    if (!lista.length) { tb.innerHTML = '<tr class="empty-row"><td colspan="4">Nenhum projetista cadastrado</td></tr>'; return; }
+    tb.innerHTML = lista.map((p, i) => `
+      <tr>
+        <td><div class="user-cell"><div class="u-avatar" style="background:${BGCORES[i%6]};color:${CORES[i%6]};">${iniciais(p.nome)}</div><span>${p.nome}</span></div></td>
+        <td style="color:var(--muted);font-size:13px;">${p.equipe || '—'}</td>
+        <td><span class="status-pill ${p.ativo?'pill--ativo':'pill--inativo'}">${p.ativo?'Ativo':'Inativo'}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-action" onclick="editarProjetista('${p.id}')" title="Editar">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button class="btn-action" onclick="toggleStatusP('${p.id}',${p.ativo})" title="${p.ativo?'Desativar':'Ativar'}">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="${p.ativo?'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636':'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'}"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  function abrirModalP() {
     editandoP = null;
-    document.getElementById('titleModalProjetista').textContent = 'Novo projetista';
-    document.getElementById('pNome').value = '';
+    document.getElementById('titleModalP').textContent = 'Novo projetista';
+    document.getElementById('pNome').value   = '';
     document.getElementById('pEquipe').value = '';
-    document.getElementById('pStatus').value = 'ativo';
-    document.getElementById('modalProjetista').classList.add('visible');
+    document.getElementById('pStatus').value = 'true';
+    document.getElementById('modalP').classList.add('visible');
     setTimeout(() => document.getElementById('pNome').focus(), 180);
   }
-}
 
-function fecharModal(id, e) {
-  if (e && e.target !== document.getElementById(id)) return;
-  document.getElementById(id).classList.remove('visible');
-}
-
-function editarComissionador(id) {
-  const u = comissionadores.find(c => c.id === id);
-  editandoC = id;
-  document.getElementById('titleModalComissionador').textContent = 'Editar comissionador';
-  document.getElementById('cNome').value    = u.nome;
-  document.getElementById('cUsuario').value = u.usuario;
-  document.getElementById('cSenha').value   = '';
-  document.getElementById('cPerfil').value  = u.perfil;
-  document.getElementById('cStatus').value  = u.status;
-  document.getElementById('modalComissionador').classList.add('visible');
-}
-
-function editarProjetista(id) {
-  const p = projetistas.find(p => p.id === id);
-  editandoP = id;
-  document.getElementById('titleModalProjetista').textContent = 'Editar projetista';
-  document.getElementById('pNome').value   = p.nome;
-  document.getElementById('pEquipe').value = p.equipe || '';
-  document.getElementById('pStatus').value = p.status;
-  document.getElementById('modalProjetista').classList.add('visible');
-}
-
-function salvarComissionador() {
-  const nome    = document.getElementById('cNome').value.trim();
-  const usuario = document.getElementById('cUsuario').value.trim();
-  const senha   = document.getElementById('cSenha').value;
-  const perfil  = document.getElementById('cPerfil').value;
-  const status  = document.getElementById('cStatus').value;
-
-  if (!nome || !usuario || !perfil) { mostrarToast('Preencha os campos obrigatórios.', true); return; }
-  if (!editandoC && !/^\d{6}$/.test(senha)) { mostrarToast('A senha deve ter exatamente 6 números.', true); return; }
-
-  if (editandoC) {
-    const idx = comissionadores.findIndex(c => c.id === editandoC);
-    comissionadores[idx] = { ...comissionadores[idx], nome, usuario, perfil, status };
-  } else {
-    comissionadores.push({ id: proximoCId++, nome, usuario, perfil, status });
+  async function editarProjetista(id) {
+    const { data } = await db.from('projetistas').select('*').eq('id', id).single();
+    if (!data) return;
+    editandoP = id;
+    document.getElementById('titleModalP').textContent = 'Editar projetista';
+    document.getElementById('pNome').value   = data.nome;
+    document.getElementById('pEquipe').value = data.equipe || '';
+    document.getElementById('pStatus').value = String(data.ativo);
+    document.getElementById('modalP').classList.add('visible');
   }
 
-  document.getElementById('modalComissionador').classList.remove('visible');
-  renderComissionadores();
-  mostrarToast(editandoC ? 'Comissionador atualizado!' : 'Comissionador cadastrado!');
-  editandoC = null;
-}
+  async function salvarProjetista() {
+    const nome   = document.getElementById('pNome').value.trim();
+    const equipe = document.getElementById('pEquipe').value || null;
+    const ativo  = document.getElementById('pStatus').value === 'true';
+    if (!nome) { mostrarToast('Informe o nome do projetista.'); return; }
 
-function salvarProjetista() {
-  const nome   = document.getElementById('pNome').value.trim();
-  const equipe = document.getElementById('pEquipe').value.trim();
-  const status = document.getElementById('pStatus').value;
+    if (editandoP) {
+      const { error } = await db.from('projetistas').update({ nome, equipe, ativo }).eq('id', editandoP);
+      if (error) { mostrarToast('Erro ao atualizar.'); return; }
+      mostrarToast('Projetista atualizado!');
+    } else {
+      const { error } = await db.from('projetistas').insert([{ nome, equipe, ativo }]);
+      if (error) { mostrarToast('Erro ao cadastrar.'); return; }
+      mostrarToast('Projetista cadastrado!');
+    }
 
-  if (!nome) { mostrarToast('Informe o nome do projetista.', true); return; }
-
-  if (editandoP) {
-    const idx = projetistas.findIndex(p => p.id === editandoP);
-    projetistas[idx] = { ...projetistas[idx], nome, equipe, status };
-  } else {
-    projetistas.push({ id: proximoPId++, nome, equipe, status });
+    document.getElementById('modalP').classList.remove('visible');
+    editandoP = null;
+    carregarProjetistas();
   }
 
-  document.getElementById('modalProjetista').classList.remove('visible');
-  renderProjetistas();
-  mostrarToast(editandoP ? 'Projetista atualizado!' : 'Projetista cadastrado!');
-  editandoP = null;
-}
+  async function toggleStatusP(id, ativo) {
+    await db.from('projetistas').update({ ativo: !ativo }).eq('id', id);
+    mostrarToast(ativo ? 'Projetista desativado.' : 'Projetista ativado.');
+    carregarProjetistas();
+  }
 
-function removerComissionador(id) {
-  comissionadores = comissionadores.filter(c => c.id !== id);
-  renderComissionadores();
-  mostrarToast('Comissionador removido.');
-}
+  // ── FILTRO ───────────────────────────────────────────────
+  function filtrarTabela(tbId, valor) {
+    document.querySelectorAll('#' + tbId + ' tr:not(.empty-row)').forEach(tr => {
+      tr.style.display = tr.innerText.toLowerCase().includes(valor.toLowerCase()) ? '' : 'none';
+    });
+  }
 
-function toggleStatusP(id) {
-  const p = projetistas.find(p => p.id === id);
-  p.status = p.status === 'ativo' ? 'inativo' : 'ativo';
-  renderProjetistas();
-  mostrarToast(p.status === 'ativo' ? 'Projetista ativado.' : 'Projetista desativado.');
-}
+  // ── MODAL ────────────────────────────────────────────────
+  function fecharModal(id, e) {
+    if (e && e.target !== document.getElementById(id)) return;
+    document.getElementById(id).classList.remove('visible');
+  }
 
-// ── BUSCA ─────────────────────────────────────────────────────
-function filtrarTabela(tbId, valor) {
-  const linhas = document.querySelectorAll('#' + tbId + ' tr:not(.empty-row)');
-  linhas.forEach(tr => {
-    tr.style.display = tr.innerText.toLowerCase().includes(valor.toLowerCase()) ? '' : 'none';
+  function mostrarToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('visible');
+    setTimeout(() => t.classList.remove('visible'), 2500);
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.getElementById('modalC').classList.remove('visible');
+      document.getElementById('modalP').classList.remove('visible');
+    }
   });
-}
 
-// ── TOAST ─────────────────────────────────────────────────────
-function mostrarToast(msg, erro = false) {
-  const t = document.getElementById('toast');
-  document.getElementById('toastMsg').textContent = msg;
-  t.style.background = erro ? 'var(--danger)' : 'var(--success)';
-  t.classList.add('visible');
-  setTimeout(() => t.classList.remove('visible'), 2500);
-}
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    document.getElementById('modalComissionador').classList.remove('visible');
-    document.getElementById('modalProjetista').classList.remove('visible');
-  }
-});
-
-// Init
-renderComissionadores();
-renderProjetistas();
+  // ── INIT ─────────────────────────────────────────────────
+  carregarComissionadores();
+  carregarProjetistas();
 </script>
 
 </body>
