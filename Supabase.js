@@ -4,41 +4,60 @@
 // Supabase → Settings → API
 // ============================================================
 
-const SUPABASE_URL  = 'COLE_SUA_PROJECT_URL_AQUI';
-const SUPABASE_KEY  = 'COLE_SUA_ANON_KEY_AQUI';
+const SUPABASE_URL = 'COLE_SUA_PROJECT_URL_AQUI';
+const SUPABASE_KEY = 'COLE_SUA_ANON_KEY_AQUI';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ============================================================
-// SESSÃO — armazena o usuário logado no localStorage
+// SESSÃO
 // ============================================================
 
 const Sessao = {
+  _chave: 'gq_usuario',
+
   salvar(usuario) {
-    localStorage.setItem('gq_sessao', JSON.stringify(usuario));
+    try {
+      localStorage.setItem(this._chave, JSON.stringify(usuario));
+    } catch(e) {
+      console.error('Erro ao salvar sessão:', e);
+    }
   },
+
   obter() {
     try {
-      return JSON.parse(localStorage.getItem('gq_sessao'));
-    } catch { return null; }
+      const raw = localStorage.getItem(this._chave);
+      if (!raw) return null;
+      const u = JSON.parse(raw);
+      // Validar que tem os campos mínimos
+      if (!u || !u.id || !u.usuario) return null;
+      return u;
+    } catch {
+      return null;
+    }
   },
+
   encerrar() {
-    localStorage.removeItem('gq_sessao');
+    try { localStorage.removeItem(this._chave); } catch(e) {}
     window.location.href = 'login.html';
   },
-  // Limpa sessão sem redirecionar (usado na abertura do login)
-  encerrarSilencioso() {
-    localStorage.removeItem('gq_sessao');
-  },
+
   exigir() {
     const u = this.obter();
-    if (!u) window.location.href = 'login.html';
+    if (!u) {
+      window.location.href = 'login.html';
+      return null;
+    }
     return u;
   },
+
   exigirAdmin() {
     const u = this.exigir();
-    if (u.perfil !== 'admin') window.location.href = 'dashboard.html';
+    if (u && u.perfil !== 'admin') {
+      window.location.href = 'dashboard.html';
+      return null;
+    }
     return u;
   }
 };
