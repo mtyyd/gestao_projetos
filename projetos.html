@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GestãoQ — Projetos</title>
+<script>
+// Verificação antecipada — redireciona antes de renderizar
+(function(){
+  try {
+    var s = localStorage.getItem('gq_usuario');
+    if (!s || !JSON.parse(s).id) { window.location.replace('login.html'); }
+  } catch(e) { window.location.replace('login.html'); }
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -224,7 +233,7 @@
           ? 'var(--danger)'
           : 'var(--accent)';
 
-      return `<tr onclick="abrirProjeto('${p.id}', '${p.ns}', '${p.cidade}', '${p.projetistaNome}', '${p.tipo_atendimento || ''}')">
+      return `<tr onclick="abrirProjeto('${p.id}','${p.ns}','${p.cidade}','${p.projetistaNome}','${p.tipo_atendimento||''}','${p.resultado}','${p.desconto}')">
         <td style="color:var(--muted);font-weight:500;">${p.ns}</td>
         <td>${p.cidade}</td>
         <td style="font-size:13px;">${p.projetistaNome}</td>
@@ -255,14 +264,12 @@
     renderTabela(filtrado);
   }
 
-  // ── ABRIR PROJETO PARA ADICIONAR ERROS ───────────────────
-  function abrirProjeto(id, ns, cidade, projetista, atendimento) {
-    // Só editor e admin podem registrar erros
-    if (usuario.perfil === 'leitor') return;
-
+  // ── ABRIR PROJETO ─────────────────────────────────────────
+  function abrirProjeto(id, ns, cidade, projetista, atendimento, resultado, desconto) {
     localStorage.setItem('gestaoq_comissionamento', JSON.stringify({
       id, ns, cidade, projetista, atendimento
     }));
+    localStorage.setItem('gestaoq_abrir_resumo', resultado ? '1' : '0');
     window.location.href = 'projeto-erros.html';
   }
 
