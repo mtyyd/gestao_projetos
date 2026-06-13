@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GestãoQ — Cadastro de Erros</title>
+<script>
+// Verificação antecipada — redireciona antes de renderizar
+(function(){
+  try {
+    var s = localStorage.getItem('gq_usuario');
+    if (!s || !JSON.parse(s).id) { window.location.replace('login.html'); }
+  } catch(e) { window.location.replace('login.html'); }
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -186,7 +195,7 @@
 
   <div class="projeto-header">
     <div class="projeto-info">
-      <h1>Cadastro de erros</h1>
+      <h1 id="tituloNS">—</h1>
       <div class="projeto-meta" id="headerMeta">Alfenas · Carlos Mendes · MT/BT — Aéreo</div>
     </div>
     <div>
@@ -346,6 +355,8 @@
   } catch(e) {}
 
   if (comissionamento.id) {
+    document.getElementById('tituloNS').textContent = comissionamento.ns || 'Cadastro de erros';
+    document.getElementById('resumoTitulo').textContent = comissionamento.ns || '—';
     document.getElementById('headerMeta').textContent =
       [comissionamento.cidade, comissionamento.projetista, comissionamento.atendimento]
         .filter(Boolean).join('  ·  ');
@@ -686,10 +697,7 @@
       if (errProjeto) throw errProjeto;
 
       mostrarToast('Erros salvos com sucesso!');
-      setTimeout(() => {
-        document.getElementById('telaResumo').style.display='none';
-        window.location.href = 'projetos.html';
-      }, 2000);
+      setTimeout(() => { window.location.href = 'projetos.html'; }, 1500);
 
     } catch(e) {
       console.error(e);
@@ -711,6 +719,56 @@
 
   // ── INIT ─────────────────────────────────────────────────
   carregarCategorias();
+
+  // Se vier de projeto existente, carregar erros e abrir resumo
+  if (localStorage.getItem('gestaoq_abrir_resumo') === '1') {
+    localStorage.removeItem('gestaoq_abrir_resumo');
+    // Carregar erros já salvos deste projeto
+    (async () => {
+      if (!comissionamento.id) return;
+      const { data } = await db.from('erros')
+        .select('*')
+        .eq('projeto_id', comissionamento.id);
+      (data || []).forEach(e => {
+        erroIdSeq++;
+        const id = 'erro-' + erroIdSeq;
+        erros.push({ id });
+        document.getElementById('emptyState').style.display = 'none';
+        const card = document.createElement('div');
+        card.className = 'erro-card'; card.id = id;
+        card.innerHTML = `
+          <div class="erro-card__header" onclick="toggleErro('${id}')">
+            <div class="erro-numero">${erros.length}</div>
+            <div class="erro-card__title preenchido" id="title-${id}">${e.categoria_nome || 'Erro'}</div>
+            <span class="gravidade-pill grav--${e.gravidade}" id="grav-${id}">${{grave:'Grave',medio:'Médio',leve:'Leve'}[e.gravidade]||''}</span>
+            <svg class="chevron" id="chev-${id}" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+            <button class="btn-remove" onclick="removerErro(event,'${id}')" title="Remover">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="erro-card__body" id="body-${id}">
+            <div class="form-grid-3">
+              <div class="field"><label>Categoria</label><input type="text" id="cat-${id}" value="${e.categoria_nome||''}" /></div>
+              <div class="field"><label>Gravidade</label><select id="grav-sel-${id}"><option value="grave"${e.gravidade==='grave'?' selected':''}>Grave</option><option value="medio"${e.gravidade==='medio'?' selected':''}>Médio</option><option value="leve"${e.gravidade==='leve'?' selected':''}>Leve</option></select></div>
+              <div class="field"><label>Ação corretiva</label><input type="text" id="acao-${id}" value="${e.acao_corretiva||''}" /></div>
+            </div>
+            <div class="form-grid-1"><div class="field"><label>Descrição</label><textarea id="desc-${id}">${e.descricao||''}</textarea></div></div>
+          </div>`;
+        document.getElementById('errosLista').appendChild(card);
+      });
+      atualizarContador();
+      // Buscar resultado e desconto do projeto
+      const { data: pData } = await db.from('projetos').select('resultado,desconto').eq('id', comissionamento.id).single();
+      if (pData) {
+        statusProjeto  = pData.resultado || '';
+        descontoValor  = pData.desconto  || 0;
+      }
+      if (erros.length > 0) {
+        renderResumo();
+        document.getElementById('telaResumo').style.display = 'block';
+      }
+    })();
+  }
 </script>
 
 </body>
