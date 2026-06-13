@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GestãoQ — Usuários</title>
+<script>
+// Verificação antecipada — redireciona antes de renderizar
+(function(){
+  try {
+    var s = localStorage.getItem('gq_usuario');
+    if (!s || !JSON.parse(s).id) { window.location.replace('login.html'); }
+  } catch(e) { window.location.replace('login.html'); }
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -136,6 +145,28 @@
     </div>
   </div>
 
+  <!-- CARDS DE CONTAGEM -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:16px;">
+      <div style="width:44px;height:44px;background:rgba(240,165,0,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#f0a500" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1;" id="countComissionadores">—</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:3px;">Comissionadores</div>
+      </div>
+    </div>
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:16px;">
+      <div style="width:44px;height:44px;background:rgba(74,158,221,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#4a9edd" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1;" id="countProjetistas">—</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:3px;">Projetistas</div>
+      </div>
+    </div>
+  </div>
+
   <div class="tabs">
     <button class="tab active" onclick="mudarAba('comissionadores')">Comissionadores</button>
     <button class="tab"        onclick="mudarAba('projetistas')">Projetistas</button>
@@ -148,14 +179,14 @@
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input type="text" placeholder="Buscar comissionador…" oninput="filtrarTabela('tbComissionadores',this.value)">
       </div>
-      <button class="btn-primary" onclick="abrirModalC()">
+      <button class="btn-primary" onclick="abrirModalC()" id="btnNovoC" style="display:none;">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         Novo comissionador
       </button>
     </div>
     <div class="table-card">
       <table>
-        <thead><tr><th>Comissionador</th><th>Usuário</th><th>Perfil</th><th>Status</th><th>Ações</th></tr></thead>
+        <thead><tr><th>Comissionador</th><th>Usuário</th><th>Perfil</th><th>Status</th>${isAdmin?"<th>Ações</th>":""}</tr></thead>
         <tbody id="tbComissionadores"><tr class="empty-row"><td colspan="5">Carregando…</td></tr></tbody>
       </table>
     </div>
@@ -168,7 +199,7 @@
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input type="text" placeholder="Buscar projetista…" oninput="filtrarTabela('tbProjetistas',this.value)">
       </div>
-      <button class="btn-primary" onclick="abrirModalP()">
+      <button class="btn-primary" onclick="abrirModalP()" id="btnNovoP" style="display:none;">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         Novo projetista
       </button>
@@ -273,8 +304,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <script>
-  // ── PROTEÇÃO — apenas admin ───────────────────────────────
-  const usuario = Sessao.exigirAdmin();
+  // ── PROTEÇÃO ─────────────────────────────────────────────
+  const usuario = Sessao.exigir();
+  const isAdmin = usuario.perfil === 'admin';
   document.getElementById('nomeUsuario').textContent  = usuario.usuario;
   document.getElementById('badgePerfil').textContent  = usuario.perfil;
   document.getElementById('avatarUsuario').textContent =
@@ -323,16 +355,7 @@
         <td style="color:var(--muted);font-size:13px;font-family:monospace;">${u.usuario}</td>
         <td><span class="perfil--${u.perfil}">${u.perfil}</span></td>
         <td><span class="status-pill ${u.ativo?'pill--ativo':'pill--inativo'}">${u.ativo?'Ativo':'Inativo'}</span></td>
-        <td>
-          <div class="action-btns">
-            <button class="btn-action" onclick="editarComissionador('${u.id}')" title="Editar">
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-            </button>
-            <button class="btn-action del" onclick="removerComissionador('${u.id}')" title="Remover">
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            </button>
-          </div>
-        </td>
+        ${isAdmin ? `<td><div class="action-btns"><button class="btn-action" onclick="editarComissionador('${u.id}')" title="Editar"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button class="btn-action del" onclick="removerComissionador('${u.id}')" title="Remover"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div></td>` : '<td>—</td>'}`
       </tr>`).join('');
   }
 
@@ -517,6 +540,21 @@
   });
 
   // ── INIT ─────────────────────────────────────────────────
+  if (isAdmin) {
+    document.getElementById('btnNovoC').style.display = '';
+    document.getElementById('btnNovoP').style.display = '';
+  }
+
+  async function carregarContadores() {
+    const [{ count: cC }, { count: cP }] = await Promise.all([
+      db.from('usuarios').select('*', { count:'exact', head:true }),
+      db.from('projetistas').select('*', { count:'exact', head:true }).eq('ativo', true),
+    ]);
+    document.getElementById('countComissionadores').textContent = cC ?? '—';
+    document.getElementById('countProjetistas').textContent     = cP ?? '—';
+  }
+
+  carregarContadores();
   carregarComissionadores();
   carregarProjetistas();
 </script>
