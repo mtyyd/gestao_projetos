@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GestãoQ — Perfil do Projetista</title>
+<script>
+// Verificação antecipada — redireciona antes de renderizar
+(function(){
+  try {
+    var s = localStorage.getItem('gq_usuario');
+    if (!s || !JSON.parse(s).id) { window.location.replace('login.html'); }
+  } catch(e) { window.location.replace('login.html'); }
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -231,10 +240,11 @@
   let chartMensal = null;
   let dadosPeriodo = {};
 
-  function classificar(ratio) {
-    if (ratio <= 5.0) return { tag:'Crítico', cls:'tag--critico', cor:D };
-    if (ratio <= 6.5) return { tag:'Atenção', cls:'tag--atencao', cor:A };
-    if (ratio <= 8.0) return { tag:'Regular', cls:'tag--regular', cor:I };
+  // Score de qualidade: (1 - reprovados/total)*10
+  function classificar(score) {
+    if (score <= 5.0) return { tag:'Crítico', cls:'tag--critico', cor:D };
+    if (score <= 6.5) return { tag:'Atenção', cls:'tag--atencao', cor:A };
+    if (score <= 8.0) return { tag:'Regular', cls:'tag--regular', cor:I };
     return                  { tag:'Ótimo',   cls:'tag--otimo',   cor:S };
   }
 
@@ -264,8 +274,8 @@
     const equipe = pData.equipe || '—';
     const erros  = vData?.total_erros    || 0;
     const projs  = vData?.total_projetos || 0;
-    const ratio  = parseFloat(vData?.erros_por_projeto) || 0;
-    const cl     = classificar(ratio);
+    const score  = parseFloat(vData?.qualidade_score) ?? 10;
+    const cl     = classificar(score);
 
     // Hero
     document.getElementById('breadcrumbNome').textContent = nome;
@@ -274,15 +284,15 @@
     document.getElementById('heroAvatar').textContent     = iniciais(nome);
     document.getElementById('heroErros').textContent      = erros;
     document.getElementById('heroProjetos').textContent   = projs;
-    document.getElementById('heroRatio').textContent      = ratio.toFixed(1);
+    document.getElementById('heroRatio').textContent      = score.toFixed(1);
     document.getElementById('heroRatio').style.color      = cl.cor;
 
     // Faixa
-    const pct = Math.min(98, Math.round((ratio / 10) * 100));
+    const pct = Math.min(98, Math.round((score / 10) * 100));
     document.getElementById('faixaMarcador').style.left = pct + '%';
     document.getElementById('faixaMarcador').style.background = cl.cor;
     const faixaTag = document.getElementById('faixaTag');
-    faixaTag.textContent  = `${ratio.toFixed(1)} — ${cl.tag}`;
+    faixaTag.textContent  = `${score.toFixed(1)} — ${cl.tag}`;
     faixaTag.className    = `faixa-tag ${cl.cls}`;
 
     // Carregar histórico e gráficos em paralelo
