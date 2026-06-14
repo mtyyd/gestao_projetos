@@ -679,12 +679,21 @@
         registrado_por: usuario.id,
       })).filter(r => r.descricao);
 
+      // 2. Apagar TODOS os erros antigos deste projeto (a tela é a fonte única)
+      //    Isso evita duplicação ao reeditar um comissionamento existente.
+      const { error: errDel } = await db
+        .from('erros')
+        .delete()
+        .eq('projeto_id', comissionamento.id);
+      if (errDel) throw errDel;
+
+      // 3. Inserir os erros atuais da tela
       if (registros.length > 0) {
         const { error: errErros } = await db.from('erros').insert(registros);
         if (errErros) throw errErros;
       }
 
-      // 2. Atualizar resultado e desconto do projeto
+      // 4. Atualizar resultado e desconto do projeto
       const { error: errProjeto } = await db
         .from('projetos')
         .update({ resultado: statusProjeto || null, desconto: descontoValor })
