@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GestãoQ — Classificação de Erros</title>
+<script>
+// Verificação antecipada — redireciona antes de renderizar
+(function(){
+  try {
+    var s = localStorage.getItem('gq_usuario');
+    if (!s || !JSON.parse(s).id) { window.location.replace('login.html'); }
+  } catch(e) { window.location.replace('login.html'); }
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -192,7 +201,7 @@
 </main>
 
 <!-- MODAL GRUPO -->
-<div class="modal-overlay" id="modalGrupo" onclick="fecharModal('modalGrupo',event)">
+<div class="modal-overlay" id="modalGrupo">
   <div class="modal">
     <div class="modal__title" id="tituloModalGrupo">Novo grupo</div>
     <div class="modal__sub">Grupos organizam as categorias por área</div>
@@ -219,7 +228,7 @@
 </div>
 
 <!-- MODAL CATEGORIA -->
-<div class="modal-overlay" id="modalCategoria" onclick="fecharModal('modalCategoria',event)">
+<div class="modal-overlay" id="modalCategoria">
   <div class="modal">
     <div class="modal__title" id="tituloModalCategoria">Nova categoria</div>
     <div class="modal__sub" id="subModalCategoria">—</div>
