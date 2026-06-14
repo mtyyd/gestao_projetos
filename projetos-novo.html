@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GestãoQ — Novo Comissionamento</title>
+<script>
+// Verificação antecipada — redireciona antes de renderizar
+(function(){
+  try {
+    var s = localStorage.getItem('gq_usuario');
+    if (!s || !JSON.parse(s).id) { window.location.replace('login.html'); }
+  } catch(e) { window.location.replace('login.html'); }
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -176,6 +185,10 @@
             <input type="date" id="entrega" />
             <span class="field__error" id="err-entrega">Informe a data do levantamento.</span>
           </div>
+          <div class="field">
+            <label for="moLev">MO LEV</label>
+            <input type="number" id="moLev" placeholder="Ex: 12" step="0.01" min="0" />
+          </div>
         </div>
       </div>
 
@@ -330,6 +343,7 @@
       tipo_cliente:     clienteEl.value,
       tipo_atendimento: tipoEl.options[tipoEl.selectedIndex].text,
       data_levantamento: document.getElementById('entrega').value,
+      mo_lev:           document.getElementById('moLev').value || null,
       criado_por:       usuario.id,
     }]).select('id').single();
 
