@@ -143,11 +143,6 @@
   document.getElementById('avatarUsuario').textContent =
     usuario.nome.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
 
-  // Sidebar só para admin
-  if (usuario.perfil === 'admin') {
-    document.getElementById('adminSidebar').style.display = '';
-  }
-
   // ── CORES ────────────────────────────────────────────────
   const PALETA = [
     { cor:'#e05252', bg:'rgba(224,82,82,.15)' },
