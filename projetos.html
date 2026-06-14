@@ -73,6 +73,8 @@
   .status--pendente  { color:var(--muted);   background:rgba(107,122,141,.1); }
 
   .tipo-badge { font-size:11px; font-weight:500; padding:3px 9px; border-radius:4px; background:rgba(255,255,255,.05); color:var(--muted); border:1px solid var(--border); }
+  .btn-del-projeto { width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; background:transparent; border:1px solid var(--border); border-radius:7px; cursor:pointer; color:var(--muted); transition:all .15s; }
+  .btn-del-projeto:hover { background:rgba(224,82,82,.1); border-color:var(--danger); color:var(--danger); }
 
   .table-footer { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); }
 
@@ -147,10 +149,11 @@
           <th>Levantamento</th>
           <th>Resultado</th>
           <th>Erros</th>
+          <th id="thAcoes" style="text-align:center;">Ações</th>
         </tr>
       </thead>
       <tbody id="tabelaProjetos">
-        <tr class="empty-row"><td colspan="8">Carregando…</td></tr>
+        <tr class="empty-row"><td colspan="9">Carregando…</td></tr>
       </tbody>
     </table>
     <div class="table-footer">
@@ -165,6 +168,7 @@
 <script>
   // ── PROTEÇÃO DE ROTA ─────────────────────────────────────
   const usuario = Sessao.exigir();
+  const isAdmin = usuario.perfil === 'admin';
   document.getElementById('nomeUsuario').textContent  = usuario.usuario;
   document.getElementById('badgePerfil').textContent  = usuario.perfil;
   document.getElementById('avatarUsuario').textContent =
@@ -173,6 +177,31 @@
   // Leitor não vê botão de novo comissionamento
   if (usuario.perfil === 'leitor') {
     document.getElementById('btnNovo').style.display = 'none';
+  }
+
+  // Coluna de ações só para admin
+  if (!isAdmin) {
+    document.getElementById('thAcoes').style.display = 'none';
+  }
+
+  // ── REMOVER COMISSIONAMENTO (admin) ──────────────────────
+  async function removerProjeto(id, ns) {
+    if (!confirm(`Remover o comissionamento NS ${ns}?\n\nEsta ação apaga o projeto e todos os seus erros permanentemente e não pode ser desfeita.`)) return;
+
+    // Apagar erros primeiro (caso o cascade não esteja ativo)
+    await db.from('erros').delete().eq('projeto_id', id);
+
+    // Apagar o projeto
+    const { error } = await db.from('projetos').delete().eq('id', id);
+    if (error) {
+      console.error(error);
+      alert('Erro ao remover o comissionamento. Tente novamente.');
+      return;
+    }
+
+    // Remover da lista local e re-renderizar
+    todosProjetos = todosProjetos.filter(p => p.id !== id);
+    filtrar();
   }
 
   // ── DADOS ────────────────────────────────────────────────
@@ -193,7 +222,7 @@
     if (error) {
       console.error(error);
       document.getElementById('tabelaProjetos').innerHTML =
-        '<tr class="empty-row"><td colspan="8">Erro ao carregar projetos.</td></tr>';
+        '<tr class="empty-row"><td colspan="9">Erro ao carregar projetos.</td></tr>';
       return;
     }
 
@@ -220,7 +249,7 @@
   function renderTabela(lista) {
     const tb = document.getElementById('tabelaProjetos');
     if (lista.length === 0) {
-      tb.innerHTML = '<tr class="empty-row"><td colspan="8">Nenhum projeto encontrado.</td></tr>';
+      tb.innerHTML = '<tr class="empty-row"><td colspan="9">Nenhum projeto encontrado.</td></tr>';
       document.getElementById('countLabel').textContent = '0 projetos';
       return;
     }
@@ -236,6 +265,14 @@
           ? 'var(--danger)'
           : 'var(--accent)';
 
+      const acaoCell = isAdmin
+        ? `<td style="text-align:center;" onclick="event.stopPropagation();">
+             <button class="btn-del-projeto" onclick="removerProjeto('${p.id}','${p.ns}')" title="Remover comissionamento">
+               <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+             </button>
+           </td>`
+        : '';
+
       return `<tr onclick="abrirProjeto('${p.id}','${p.ns}','${p.cidade}','${p.projetistaNome}','${p.tipo_atendimento||''}','${p.resultado}','${p.desconto}')">
         <td style="color:var(--muted);font-weight:500;">${p.ns}</td>
         <td>${p.cidade}</td>
@@ -245,6 +282,7 @@
         <td style="color:var(--muted);font-size:13px;">${data}</td>
         <td><span class="status-badge status--${p.resultado}">${statusLabels[p.resultado]}</span></td>
         <td style="color:${corErro};font-weight:500;">${p.totalErros}</td>
+        ${acaoCell}
       </tr>`;
     }).join('');
 
