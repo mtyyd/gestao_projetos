@@ -142,6 +142,7 @@
           <th>Nota de Serviço</th>
           <th>Cidade</th>
           <th>Projetista</th>
+          <th>Comissionador</th>
           <th>Cliente</th>
           <th>Levantamento</th>
           <th>Resultado</th>
@@ -149,7 +150,7 @@
         </tr>
       </thead>
       <tbody id="tabelaProjetos">
-        <tr class="empty-row"><td colspan="7">Carregando…</td></tr>
+        <tr class="empty-row"><td colspan="8">Carregando…</td></tr>
       </tbody>
     </table>
     <div class="table-footer">
@@ -184,6 +185,7 @@
         id, ns, cidade, tipo_cliente, tipo_atendimento,
         data_levantamento, resultado, desconto,
         projetistas ( nome ),
+        usuarios!projetos_criado_por_fkey ( nome ),
         erros ( id )
       `)
       .order('criado_em', { ascending: false });
@@ -191,15 +193,16 @@
     if (error) {
       console.error(error);
       document.getElementById('tabelaProjetos').innerHTML =
-        '<tr class="empty-row"><td colspan="7">Erro ao carregar projetos.</td></tr>';
+        '<tr class="empty-row"><td colspan="8">Erro ao carregar projetos.</td></tr>';
       return;
     }
 
     todosProjetos = (data || []).map(p => ({
       ...p,
-      projetistaNome: p.projetistas?.nome || '—',
-      totalErros:     p.erros?.length || 0,
-      resultado:      p.resultado || 'pendente',
+      projetistaNome:   p.projetistas?.nome || '—',
+      comissionadorNome: p.usuarios?.nome || '—',
+      totalErros:       p.erros?.length || 0,
+      resultado:        p.resultado || 'pendente',
     }));
 
     renderTabela(todosProjetos);
@@ -217,7 +220,7 @@
   function renderTabela(lista) {
     const tb = document.getElementById('tabelaProjetos');
     if (lista.length === 0) {
-      tb.innerHTML = '<tr class="empty-row"><td colspan="7">Nenhum projeto encontrado.</td></tr>';
+      tb.innerHTML = '<tr class="empty-row"><td colspan="8">Nenhum projeto encontrado.</td></tr>';
       document.getElementById('countLabel').textContent = '0 projetos';
       return;
     }
@@ -237,6 +240,7 @@
         <td style="color:var(--muted);font-weight:500;">${p.ns}</td>
         <td>${p.cidade}</td>
         <td style="font-size:13px;">${p.projetistaNome}</td>
+        <td style="font-size:13px;color:var(--muted);">${p.comissionadorNome}</td>
         <td><span class="tipo-badge">${clienteLabels[p.tipo_cliente] || p.tipo_cliente}</span></td>
         <td style="color:var(--muted);font-size:13px;">${data}</td>
         <td><span class="status-badge status--${p.resultado}">${statusLabels[p.resultado]}</span></td>
