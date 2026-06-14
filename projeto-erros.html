@@ -224,12 +224,8 @@
       <div class="erros-header">
         <div>
           <div class="erros-title">Registro de erros</div>
-          <div class="erros-sub">Adicione todos os erros encontrados neste projeto</div>
+          <div class="erros-sub">Clique numa categoria ao lado para adicionar um erro</div>
         </div>
-        <button class="btn-add" onclick="adicionarErro()">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-          Adicionar erro
-        </button>
       </div>
 
       <div class="erros-lista" id="errosLista"></div>
@@ -237,7 +233,7 @@
       <div class="empty-state" id="emptyState">
         <svg width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         <p>Nenhum erro registrado ainda</p>
-        <span style="font-size:13px;">Clique em "Adicionar erro" ou selecione uma categoria ao lado</span>
+        <span style="font-size:13px;">Selecione uma categoria ao lado para adicionar</span>
       </div>
 
       <div class="form-actions">
@@ -426,16 +422,9 @@
     const cat = catsPainel.find(c => c.id === catId);
     if (!cat) return;
 
-    const errosAbertos = erros.filter(e => {
-      const body = document.getElementById('body-' + e.id);
-      return body && body.classList.contains('aberto');
-    });
-
-    let alvo = errosAbertos.length > 0
-      ? errosAbertos[errosAbertos.length - 1]
-      : (erros.length > 0 ? erros[erros.length - 1] : null);
-
-    if (!alvo) { adicionarErro(); alvo = erros[erros.length - 1]; }
+    // Sempre cria um novo erro ao clicar na categoria
+    adicionarErro();
+    const alvo = erros[erros.length - 1];
 
     const input = document.getElementById('cat-' + alvo.id);
     if (input) {
@@ -569,7 +558,6 @@
   }
 
   function abrirResumo() {
-    if (!erros.length) { mostrarToast('Adicione pelo menos um erro antes de salvar.'); return; }
     document.getElementById('modalDesconto').classList.add('visible');
   }
 
@@ -588,6 +576,14 @@
   function fecharResumo() {
     document.getElementById('telaResumo').style.display='none';
     document.getElementById('textoEmailWrap').style.display='none';
+    // Garantir que todos os cards de erro estejam visíveis e expandidos
+    document.getElementById('emptyState').style.display = erros.length ? 'none' : '';
+    erros.forEach(({ id }) => {
+      const body = document.getElementById('body-' + id);
+      const chev = document.getElementById('chev-' + id);
+      if (body && !body.classList.contains('aberto')) body.classList.add('aberto');
+      if (chev && !chev.classList.contains('aberto')) chev.classList.add('aberto');
+    });
   }
 
   function renderResumo() {
